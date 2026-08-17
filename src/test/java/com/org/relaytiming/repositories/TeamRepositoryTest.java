@@ -1,6 +1,6 @@
 package com.org.relaytiming.repositories;
 
-import com.org.relaytiming.entities.Teams;
+import com.org.relaytiming.entities.TeamEntity;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest;
@@ -18,10 +18,10 @@ class TeamRepositoryTest {
 
     @Test
     void testSaveAndFindTeamById() {
-        Teams team = new Teams(20L, "Team Alpha");
+        TeamEntity team = new TeamEntity(20L, "Team Alpha");
         teamRepository.saveAndFlush(team);
 
-        Optional<Teams> found = teamRepository.findById(20L);
+        Optional<TeamEntity> found = teamRepository.findById(20L);
 
         assertTrue(found.isPresent());
         assertEquals("Team Alpha", found.get().getName());
@@ -29,13 +29,13 @@ class TeamRepositoryTest {
 
     @Test
     void testUpdateTeamName() {
-        Teams team = new Teams(21L, "Team Beta");
+        TeamEntity team = new TeamEntity(21L, "Team Beta");
         teamRepository.saveAndFlush(team);
 
         team.setName("Team Beta Updated");
         teamRepository.saveAndFlush(team);
 
-        Optional<Teams> found = teamRepository.findById(21L);
+        Optional<TeamEntity> found = teamRepository.findById(21L);
 
         assertTrue(found.isPresent());
         assertEquals("Team Beta Updated", found.get().getName());

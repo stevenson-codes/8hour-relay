@@ -9,7 +9,7 @@ import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "runners")
-public class Runners {
+public class RunnerEntity {
     @Id
     @Column(nullable = false, unique = true)
     private Long id;
@@ -22,22 +22,30 @@ public class Runners {
 
     @ManyToOne
     @JoinColumn(name = "team_id", nullable = false)
-    private Teams team;
+    private TeamEntity team;
 
-    public Runners() {
+    public RunnerEntity() {
     }
 
-    public Runners(Teams team, String runnerID, String name) {
+    public RunnerEntity(TeamEntity team, String runnerID, String name) {
         this.team = team;
         this.runnerID = runnerID;
         this.name = name;
     }
 
-    public Teams getTeam() {
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public TeamEntity getTeam() {
         return team;
     }
 
-    public void setTeam(Teams team) {
+    public void setTeam(TeamEntity team) {
         this.team = team;
     }
 

@@ -7,7 +7,7 @@ import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "teams")
-public class Teams {
+public class TeamEntity {
     
     @Id
     @Column(nullable = false, unique = true)
@@ -16,9 +16,9 @@ public class Teams {
     @Column(nullable = false, unique = true)
     private String name;
 
-    protected Teams() {}
+    protected TeamEntity() {}
 
-    public Teams(Long id, String name) {
+    public TeamEntity(Long id, String name) {
         this.id = id;
         this.name = name;
     }

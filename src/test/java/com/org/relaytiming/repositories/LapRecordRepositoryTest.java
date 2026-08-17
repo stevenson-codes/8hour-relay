@@ -1,8 +1,8 @@
 package com.org.relaytiming.repositories;
 
-import com.org.relaytiming.entities.LapRecords;
-import com.org.relaytiming.entities.Runners;
-import com.org.relaytiming.entities.Teams;
+import com.org.relaytiming.entities.LapRecordEntity;
+import com.org.relaytiming.entities.RunnerEntity;
+import com.org.relaytiming.entities.TeamEntity;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest;
@@ -27,14 +27,14 @@ class LapRecordRepositoryTest {
 
     @Test
     void testSaveAndFindLapRecord() {
-        Teams team = new Teams(1L, "Team A");
+        TeamEntity team = new TeamEntity(1L, "Team A");
         teamRepository.saveAndFlush(team);
 
-        Runners runner = new Runners(team, "R001", "John Doe");
+        RunnerEntity runner = new RunnerEntity(team, "R001", "John Doe");
         setRunnerId(runner, 1001L);
         runnerRepository.saveAndFlush(runner);
 
-        LapRecords lapRecord = new LapRecords(runner, 1, 1, 300.5, LocalDateTime.now());
+        LapRecordEntity lapRecord = new LapRecordEntity(runner, 1, 1, 300.5, LocalDateTime.now());
         lapRecordRepository.saveAndFlush(lapRecord);
 
         assertNotNull(lapRecord.getId());
@@ -42,17 +42,17 @@ class LapRecordRepositoryTest {
 
     @Test
     void testLapRecordRelationshipWithRunner() {
-        Teams team = new Teams(2L, "Team B");
+        TeamEntity team = new TeamEntity(2L, "Team B");
         teamRepository.saveAndFlush(team);
 
-        Runners runner = new Runners(team, "R002", "Jane Smith");
+        RunnerEntity runner = new RunnerEntity(team, "R002", "Jane Smith");
         setRunnerId(runner, 1002L);
         runnerRepository.saveAndFlush(runner);
 
-        LapRecords lapRecord = new LapRecords(runner, 1, 1, 250.75, LocalDateTime.now());
+        LapRecordEntity lapRecord = new LapRecordEntity(runner, 1, 1, 250.75, LocalDateTime.now());
         lapRecordRepository.saveAndFlush(lapRecord);
 
-        Optional<LapRecords> found = lapRecordRepository.findById(lapRecord.getId());
+        Optional<LapRecordEntity> found = lapRecordRepository.findById(lapRecord.getId());
         
         assertTrue(found.isPresent());
         assertEquals(1, found.get().getRunnerLapNumber());
@@ -60,9 +60,9 @@ class LapRecordRepositoryTest {
         assertEquals("Jane Smith", found.get().getRunner().getName());
     }
 
-    private void setRunnerId(Runners runner, Long id) {
+    private void setRunnerId(RunnerEntity runner, Long id) {
         try {
-            Field idField = Runners.class.getDeclaredField("id");
+            Field idField = RunnerEntity.class.getDeclaredField("id");
             idField.setAccessible(true);
             idField.set(runner, id);
         } catch (ReflectiveOperationException e) {

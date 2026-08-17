@@ -1,7 +1,7 @@
 package com.org.relaytiming.repositories;
 
-import com.org.relaytiming.entities.Runners;
+import com.org.relaytiming.entities.RunnerEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface RunnerRepository extends JpaRepository<Runners, Long> {
+public interface RunnerRepository extends JpaRepository<RunnerEntity, Long> {
 }

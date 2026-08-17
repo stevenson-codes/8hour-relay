@@ -1,7 +1,10 @@
 package com.org.relaytiming.repositories;
 
-import com.org.relaytiming.entities.Teams;
+import com.org.relaytiming.entities.TeamEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface TeamRepository extends JpaRepository<Teams, Long> {
+import java.util.Optional;
+
+public interface TeamRepository extends JpaRepository<TeamEntity, Long> {
+	Optional<TeamEntity> findByName(String name);
 }
