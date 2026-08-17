@@ -16,6 +16,8 @@ public class Teams {
     @Column(nullable = false, unique = true)
     private String name;
 
+    protected Teams() {}
+
     public Teams(Long id, String name) {
         this.id = id;
         this.name = name;
