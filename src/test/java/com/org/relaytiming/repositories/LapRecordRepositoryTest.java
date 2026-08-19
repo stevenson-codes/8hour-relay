@@ -32,7 +32,7 @@ class LapRecordRepositoryTest {
         RunnerEntity runner = new RunnerEntity(team, "EPC-001", "John Doe");
         runnerRepository.saveAndFlush(runner);
 
-        LapRecordEntity lapRecord = new LapRecordEntity(runner, 1, 1, 300.5, LocalDateTime.now());
+        LapRecordEntity lapRecord = new LapRecordEntity(runner, 1, 300.5, LocalDateTime.now());
         lapRecordRepository.saveAndFlush(lapRecord);
 
         assertNotNull(lapRecord.getId());
@@ -46,13 +46,13 @@ class LapRecordRepositoryTest {
         RunnerEntity runner = new RunnerEntity(team, "EPC-002", "Jane Smith");
         runnerRepository.saveAndFlush(runner);
 
-        LapRecordEntity lapRecord = new LapRecordEntity(runner, 1, 1, 250.75, LocalDateTime.now());
+        LapRecordEntity lapRecord = new LapRecordEntity(runner, 1, 250.75, LocalDateTime.now());
         lapRecordRepository.saveAndFlush(lapRecord);
 
         Optional<LapRecordEntity> found = lapRecordRepository.findById(lapRecord.getId());
 
         assertTrue(found.isPresent());
-        assertEquals(1, found.get().getRunnerLapNumber());
+        assertEquals(1, found.get().getLapNumber());
         assertEquals(250.75, found.get().getLapTime());
         assertEquals("Jane Smith", found.get().getRunner().getName());
     }

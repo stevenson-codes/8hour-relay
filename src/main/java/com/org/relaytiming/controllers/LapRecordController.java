@@ -40,8 +40,7 @@ public class LapRecordController {
 
 		LapRecordEntity lapRecord = new LapRecordEntity(
 			runner,
-			request.teamLapNumber(),
-			request.runnerLapNumber(),
+			request.lapNumber(),
 			request.lapTime(),
 			request.timestamp()
 		);
@@ -68,8 +67,7 @@ public class LapRecordController {
 		return new LapRecordDTO(
 			lapRecord.getId(),
 			lapRecord.getRunner().getId(),
-			lapRecord.getTeamLapNumber(),
-			lapRecord.getRunnerLapNumber(),
+			lapRecord.getLapNumber(),
 			lapRecord.getLapTime(),
 			lapRecord.getTimestamp()
 		);

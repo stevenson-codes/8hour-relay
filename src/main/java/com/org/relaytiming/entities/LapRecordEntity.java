@@ -18,14 +18,15 @@ public class LapRecordEntity {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "runner_epc_hex", referencedColumnName = "epcHex", nullable = false)
+    @JoinColumn(name = "team_epc_hex", referencedColumnName = "epcHex", nullable = true)
+    private TeamEntity team;
+
+    @ManyToOne
+    @JoinColumn(name = "runner_epc_hex", referencedColumnName = "epcHex", nullable = true)
     private RunnerEntity runner;
 
     @Column(nullable = false)
-    private Integer teamLapNumber;
-
-    @Column(nullable = false)
-    private Integer runnerLapNumber;
+    private Integer lapNumber;
 
     @Column(nullable = true)
     private Double lapTime;
@@ -36,10 +37,18 @@ public class LapRecordEntity {
     public LapRecordEntity() {
     }
 
-    public LapRecordEntity(RunnerEntity runner, Integer teamLapNumber, Integer runnerLapNumber, Double lapTime, LocalDateTime timestamp) {
+    public LapRecordEntity(RunnerEntity runner, Integer lapNumber, Double lapTime, LocalDateTime timestamp) {
+        this.team = null;
         this.runner = runner;
-        this.teamLapNumber = teamLapNumber;
-        this.runnerLapNumber = runnerLapNumber;
+        this.lapNumber = lapNumber;
+        this.lapTime = lapTime;
+        this.timestamp = timestamp;
+    }
+
+    public LapRecordEntity(TeamEntity team, Integer lapNumber, Double lapTime, LocalDateTime timestamp) {
+        this.team = team;
+        this.runner = null;
+        this.lapNumber = lapNumber;
         this.lapTime = lapTime;
         this.timestamp = timestamp;
     }
@@ -60,20 +69,20 @@ public class LapRecordEntity {
         this.runner = runner;
     }
 
-    public Integer getTeamLapNumber() {
-        return teamLapNumber;
+    public TeamEntity getTeam() {
+        return team;
     }
 
-    public void setTeamLapNumber(Integer teamLapNumber) {
-        this.teamLapNumber = teamLapNumber;
+    public void setTeam(TeamEntity team) {
+        this.team = team;
     }
 
-    public Integer getRunnerLapNumber() {
-        return runnerLapNumber;
+    public Integer getLapNumber() {
+        return lapNumber;
     }
 
-    public void setRunnerLapNumber(Integer runnerLapNumber) {
-        this.runnerLapNumber = runnerLapNumber;
+    public void setLapNumber(Integer lapNumber) {
+        this.lapNumber = lapNumber;
     }
 
     public Double getLapTime() {

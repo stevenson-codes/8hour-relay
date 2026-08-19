@@ -2,8 +2,11 @@ package com.org.relaytiming.services;
 
 import com.org.relaytiming.entities.LapRecordEntity;
 import com.org.relaytiming.entities.RunnerEntity;
+import com.org.relaytiming.entities.TeamEntity;
 import com.org.relaytiming.repositories.LapRecordRepository;
 import com.org.relaytiming.repositories.RunnerRepository;
+import com.org.relaytiming.repositories.TeamRepository;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -20,10 +23,12 @@ public class LapRecordService {
     private static final Logger logger = LoggerFactory.getLogger(LapRecordService.class);
 
     private final LapRecordRepository lapRecordRepository;
+    private final TeamRepository teamRepository;
     private final RunnerRepository runnerRepository;
 
-    public LapRecordService(LapRecordRepository lapRecordRepository, RunnerRepository runnerRepository) {
+    public LapRecordService(LapRecordRepository lapRecordRepository, TeamRepository teamRepository, RunnerRepository runnerRepository) {
         this.lapRecordRepository = lapRecordRepository;
+        this.teamRepository = teamRepository;
         this.runnerRepository = runnerRepository;
     }
 
@@ -34,35 +39,62 @@ public class LapRecordService {
         }
 
         Optional<RunnerEntity> runnerOpt = runnerRepository.findByEpcHex(epcHex);
-        if (runnerOpt.isEmpty()) {
-            logger.warn("No runner found for EPC {}. Skipping lap record.", epcHex);
+        Optional<TeamEntity> teamOpt = teamRepository.findByEpcHex(epcHex);
+        if (runnerOpt.isEmpty() && teamOpt.isEmpty()) {
+            logger.warn("No runner or team found for EPC {}. Skipping lap record.", epcHex);
             return;
         }
 
-        RunnerEntity runner = runnerOpt.get();
         LocalDateTime recordedAt = parseTimestamp(timestamp);
 
-        Integer latestRunnerLap = lapRecordRepository.findMaxRunnerLapNumberByRunner(runner);
-        Integer latestTeamLap = lapRecordRepository.findMaxTeamLapNumberByRunnerTeamId(runner.getTeam().getId());
+        if (runnerOpt.isPresent()) {
+            recordRunnerLap(runnerOpt.get(), recordedAt);
+            return;
+        }
 
-        int runnerLapNumber = (latestRunnerLap == null) ? 0 : latestRunnerLap + 1;
-        int teamLapNumber = (latestTeamLap == null) ? 0 : latestTeamLap + 1;
+        recordTeamLap(teamOpt.get(), recordedAt);
+    }
+
+    private void recordRunnerLap(RunnerEntity runner, LocalDateTime recordedAt) {
+        Integer latestLap = lapRecordRepository.findMaxLapNumberByRunner(runner);
+        int lapNumber = (latestLap == null) ? 0 : latestLap + 1;
 
         Double lapTimeSeconds = 0.0;
-        Optional<LapRecordEntity> previousLap = lapRecordRepository.findTopByRunnerOrderByRunnerLapNumberDesc(runner);
+        Optional<LapRecordEntity> previousLap = lapRecordRepository.findTopByRunnerOrderByLapNumberDesc(runner);
         if (previousLap.isPresent() && previousLap.get().getTimestamp() != null) {
             lapTimeSeconds = (double) Duration.between(previousLap.get().getTimestamp(), recordedAt).getSeconds();
         }
 
-        if (runnerLapNumber == 0) {
+        if (lapNumber == 0) {
             lapTimeSeconds = 0.0;
         }
 
-        LapRecordEntity lapRecord = new LapRecordEntity(runner, teamLapNumber, runnerLapNumber, lapTimeSeconds, recordedAt);
+        LapRecordEntity lapRecord = new LapRecordEntity(runner, lapNumber, lapTimeSeconds, recordedAt);
         lapRecordRepository.save(lapRecord);
 
-        logger.info("Saved lap record for runner {} at {} (team lap {}, runner lap {}, lapTime={})",
-                runner.getName(), recordedAt, teamLapNumber, runnerLapNumber, lapTimeSeconds);
+        logger.info("Saved runner lap for {} at {} (lap {}, lapTime={})",
+                runner.getName(), recordedAt, lapNumber, lapTimeSeconds);
+    }
+
+    private void recordTeamLap(TeamEntity team, LocalDateTime recordedAt) {
+        Integer latestLap = lapRecordRepository.findMaxLapNumberByTeam(team);
+        int lapNumber = (latestLap == null) ? 0 : latestLap + 1;
+
+        Double lapTimeSeconds = 0.0;
+        Optional<LapRecordEntity> previousLap = lapRecordRepository.findTopByTeamOrderByLapNumberDesc(team);
+        if (previousLap.isPresent() && previousLap.get().getTimestamp() != null) {
+            lapTimeSeconds = (double) Duration.between(previousLap.get().getTimestamp(), recordedAt).getSeconds();
+        }
+
+        if (lapNumber == 0) {
+            lapTimeSeconds = 0.0;
+        }
+
+        LapRecordEntity lapRecord = new LapRecordEntity(team, lapNumber, lapTimeSeconds, recordedAt);
+        lapRecordRepository.save(lapRecord);
+
+        logger.info("Saved team lap for {} at {} (lap {}, lapTime={})",
+                team.getName(), recordedAt, lapNumber, lapTimeSeconds);
     }
 
     private LocalDateTime parseTimestamp(String timestamp) {

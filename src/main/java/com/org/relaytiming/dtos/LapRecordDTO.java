@@ -5,8 +5,7 @@ import java.time.LocalDateTime;
 public record LapRecordDTO(
     Long id,
     Long runnerId,
-    Integer teamLapNumber,
-    Integer runnerLapNumber,
+    Integer lapNumber,
     Double lapTime,
     LocalDateTime timestamp
 ) {

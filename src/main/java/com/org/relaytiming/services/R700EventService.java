@@ -1,6 +1,7 @@
 package com.org.relaytiming.services;
 
 import com.org.relaytiming.entities.RunnerEntity;
+import com.org.relaytiming.entities.TeamEntity;
 import com.org.relaytiming.mqtt.R700TagEvent;
 import com.org.relaytiming.repositories.RunnerRepository;
 import com.org.relaytiming.repositories.TeamRepository;
@@ -46,7 +47,9 @@ public class R700EventService {
             return;
         }
 
-        if (runnerRepository.findByEpcHex(tag.epcHex()).isEmpty()) {
+        boolean knownRunner = runnerRepository.findByEpcHex(tag.epcHex()).isPresent();
+        boolean knownTeam = teamRepository.findByEpcHex(tag.epcHex()).isPresent();
+        if (!knownRunner && !knownTeam) {
             return;
         }
 
@@ -99,6 +102,11 @@ public class R700EventService {
         }
 
         Optional<RunnerEntity> runner = runnerRepository.findByEpcHex(bestRead.epcHex);
+        Optional<TeamEntity> team = teamRepository.findByEpcHex(bestRead.epcHex);
+
+        if (runner.isEmpty() && team.isEmpty()) {
+            return;
+        }
 
         if (runner.isPresent()) {
             logger.info("[PASS] EPC: {} | Ant: {} | Strongest RSSI: {} dBm | Runner: {} | Timestamp: {}",
@@ -107,8 +115,16 @@ public class R700EventService {
                     bestRead.peakRssiCdbm / 100.0,
                     runner.get().getName(),
                     bestRead.timestamp);
-            lapRecordService.recordLap(bestRead.epcHex, bestRead.timestamp);
+        } else {
+            logger.info("[PASS] EPC: {} | Ant: {} | Strongest RSSI: {} dBm | Team: {} | Timestamp: {}",
+                    bestRead.epcHex,
+                    bestRead.antennaPort,
+                    bestRead.peakRssiCdbm / 100.0,
+                    team.get().getName(),
+                    bestRead.timestamp);
         }
+
+        lapRecordService.recordLap(bestRead.epcHex, bestRead.timestamp);
     }
 
     private static final class BestRead {
