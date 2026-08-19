@@ -2,6 +2,7 @@ package com.org.relaytiming.entities;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
@@ -11,11 +12,11 @@ import jakarta.persistence.Table;
 @Table(name = "runners")
 public class RunnerEntity {
     @Id
-    @Column(nullable = false, unique = true)
+    @GeneratedValue(strategy = jakarta.persistence.GenerationType.IDENTITY)
     private Long id;
 
     @Column(nullable = false, unique = true)
-    private String runnerID;
+    private String epcHex;
     
     @Column(nullable = false)
     private String name;
@@ -27,9 +28,9 @@ public class RunnerEntity {
     public RunnerEntity() {
     }
 
-    public RunnerEntity(TeamEntity team, String runnerID, String name) {
+    public RunnerEntity(TeamEntity team, String epcHex, String name) {
         this.team = team;
-        this.runnerID = runnerID;
+        this.epcHex = epcHex;
         this.name = name;
     }
 
@@ -49,12 +50,12 @@ public class RunnerEntity {
         this.team = team;
     }
 
-    public String getRunnerID() {
-        return runnerID;
+    public String getEpcHex() {
+        return epcHex;
     }
 
-    public void setRunnerID(String runnerID) {
-        this.runnerID = runnerID;
+    public void setEpcHex(String epcHex) {
+        this.epcHex = epcHex;
     }
 
     public String getName() {

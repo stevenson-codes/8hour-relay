@@ -18,10 +18,10 @@ class TeamRepositoryTest {
 
     @Test
     void testSaveAndFindTeamById() {
-        TeamEntity team = new TeamEntity(20L, "Team Alpha");
+        TeamEntity team = new TeamEntity(null, "TEAM-EPC-20", "Team Alpha");
         teamRepository.saveAndFlush(team);
 
-        Optional<TeamEntity> found = teamRepository.findById(20L);
+        Optional<TeamEntity> found = teamRepository.findById(team.getId());
 
         assertTrue(found.isPresent());
         assertEquals("Team Alpha", found.get().getName());
@@ -29,13 +29,13 @@ class TeamRepositoryTest {
 
     @Test
     void testUpdateTeamName() {
-        TeamEntity team = new TeamEntity(21L, "Team Beta");
+        TeamEntity team = new TeamEntity(null, "TEAM-EPC-21", "Team Beta");
         teamRepository.saveAndFlush(team);
 
         team.setName("Team Beta Updated");
         teamRepository.saveAndFlush(team);
 
-        Optional<TeamEntity> found = teamRepository.findById(21L);
+        Optional<TeamEntity> found = teamRepository.findById(team.getId());
 
         assertTrue(found.isPresent());
         assertEquals("Team Beta Updated", found.get().getName());

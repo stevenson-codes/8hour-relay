@@ -6,7 +6,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest;
 
-import java.lang.reflect.Field;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -23,43 +22,31 @@ class RunnerRepositoryTest {
 
     @Test
     void testSaveAndFindRunnerById() {
-        TeamEntity team = new TeamEntity(10L, "Team Runner A");
+        TeamEntity team = new TeamEntity(null, "TEAM-EPC-10", "Team Runner A");
         teamRepository.saveAndFlush(team);
 
-        RunnerEntity runner = new RunnerEntity(team, "R100", "Runner One");
-        setRunnerId(runner, 1100L);
+        RunnerEntity runner = new RunnerEntity(team, "EPC-100", "Runner One");
         runnerRepository.saveAndFlush(runner);
 
-        Optional<RunnerEntity> found = runnerRepository.findById(1100L);
+        Optional<RunnerEntity> found = runnerRepository.findById(runner.getId());
 
         assertTrue(found.isPresent());
-        assertEquals("R100", found.get().getRunnerID());
+        assertEquals("EPC-100", found.get().getEpcHex());
         assertEquals("Runner One", found.get().getName());
     }
 
     @Test
     void testRunnerTeamRelationshipIsPersisted() {
-        TeamEntity team = new TeamEntity(11L, "Team Runner B");
+        TeamEntity team = new TeamEntity(null, "TEAM-EPC-11", "Team Runner B");
         teamRepository.saveAndFlush(team);
 
-        RunnerEntity runner = new RunnerEntity(team, "R101", "Runner Two");
-        setRunnerId(runner, 1101L);
+        RunnerEntity runner = new RunnerEntity(team, "EPC-101", "Runner Two");
         runnerRepository.saveAndFlush(runner);
 
-        Optional<RunnerEntity> found = runnerRepository.findById(1101L);
+        Optional<RunnerEntity> found = runnerRepository.findById(runner.getId());
 
         assertTrue(found.isPresent());
         assertEquals("Team Runner B", found.get().getTeam().getName());
-        assertEquals(11L, found.get().getTeam().getId());
-    }
-
-    private void setRunnerId(RunnerEntity runner, Long id) {
-        try {
-            Field idField = RunnerEntity.class.getDeclaredField("id");
-            idField.setAccessible(true);
-            idField.set(runner, id);
-        } catch (ReflectiveOperationException e) {
-            throw new IllegalStateException("Unable to set runner id for test setup", e);
-        }
+        assertEquals(team.getId(), found.get().getTeam().getId());
     }
 }

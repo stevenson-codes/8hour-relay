@@ -7,7 +7,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest;
 
-import java.lang.reflect.Field;
 import java.time.LocalDateTime;
 import java.util.Optional;
 
@@ -27,11 +26,10 @@ class LapRecordRepositoryTest {
 
     @Test
     void testSaveAndFindLapRecord() {
-        TeamEntity team = new TeamEntity(1L, "Team A");
+        TeamEntity team = new TeamEntity(null, "TEAM-EPC-1", "Team A");
         teamRepository.saveAndFlush(team);
 
-        RunnerEntity runner = new RunnerEntity(team, "R001", "John Doe");
-        setRunnerId(runner, 1001L);
+        RunnerEntity runner = new RunnerEntity(team, "EPC-001", "John Doe");
         runnerRepository.saveAndFlush(runner);
 
         LapRecordEntity lapRecord = new LapRecordEntity(runner, 1, 1, 300.5, LocalDateTime.now());
@@ -42,31 +40,20 @@ class LapRecordRepositoryTest {
 
     @Test
     void testLapRecordRelationshipWithRunner() {
-        TeamEntity team = new TeamEntity(2L, "Team B");
+        TeamEntity team = new TeamEntity(null, "TEAM-EPC-2", "Team B");
         teamRepository.saveAndFlush(team);
 
-        RunnerEntity runner = new RunnerEntity(team, "R002", "Jane Smith");
-        setRunnerId(runner, 1002L);
+        RunnerEntity runner = new RunnerEntity(team, "EPC-002", "Jane Smith");
         runnerRepository.saveAndFlush(runner);
 
         LapRecordEntity lapRecord = new LapRecordEntity(runner, 1, 1, 250.75, LocalDateTime.now());
         lapRecordRepository.saveAndFlush(lapRecord);
 
         Optional<LapRecordEntity> found = lapRecordRepository.findById(lapRecord.getId());
-        
+
         assertTrue(found.isPresent());
         assertEquals(1, found.get().getRunnerLapNumber());
         assertEquals(250.75, found.get().getLapTime());
         assertEquals("Jane Smith", found.get().getRunner().getName());
-    }
-
-    private void setRunnerId(RunnerEntity runner, Long id) {
-        try {
-            Field idField = RunnerEntity.class.getDeclaredField("id");
-            idField.setAccessible(true);
-            idField.set(runner, id);
-        } catch (ReflectiveOperationException e) {
-            throw new IllegalStateException("Unable to set runner id for test setup", e);
-        }
     }
 }

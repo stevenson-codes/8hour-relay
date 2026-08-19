@@ -3,12 +3,16 @@ package com.org.relaytiming.services;
 import com.org.relaytiming.entities.RunnerEntity;
 import com.org.relaytiming.mqtt.R700TagEvent;
 import com.org.relaytiming.repositories.RunnerRepository;
+import com.org.relaytiming.repositories.TeamRepository;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
@@ -17,13 +21,17 @@ import java.util.concurrent.ConcurrentHashMap;
 public class R700EventService {
 
     private static final Logger logger = LoggerFactory.getLogger(R700EventService.class);
-    private static final Duration PASS_WINDOW = Duration.ofSeconds(2);
+    private static final Duration PASS_WINDOW = Duration.ofSeconds(10);
 
     private final RunnerRepository runnerRepository;
+    private final TeamRepository teamRepository;
+    private final LapRecordService lapRecordService;
     private final Map<String, BestRead> strongestByPass = new ConcurrentHashMap<>();
 
-    public R700EventService(RunnerRepository runnerRepository) {
+    public R700EventService(RunnerRepository runnerRepository, TeamRepository teamRepository, LapRecordService lapRecordService) {
         this.runnerRepository = runnerRepository;
+        this.teamRepository = teamRepository;
+        this.lapRecordService = lapRecordService;
     }
 
     public void handleTagEvent(R700TagEvent event) {
@@ -38,12 +46,22 @@ public class R700EventService {
             return;
         }
 
-        String passKey = tag.epcHex() + ":" + tag.antennaPort();
+        if (runnerRepository.findByEpcHex(tag.epcHex()).isEmpty()) {
+            return;
+        }
+
+        String passKey = tag.epcHex();
         Instant now = Instant.now();
         BestRead currentBest = strongestByPass.get(passKey);
 
-        if (currentBest == null || isPassExpired(currentBest, now)) {
+        if (currentBest == null) {
+            strongestByPass.put(passKey, new BestRead(tag.epcHex(), tag.antennaPort(), tag.peakRssiCdbm(), now, event.timestamp()));
+            return;
+        }
+
+        if (isPassExpired(currentBest, now)) {
             flushBestRead(currentBest);
+            strongestByPass.remove(passKey);
             strongestByPass.put(passKey, new BestRead(tag.epcHex(), tag.antennaPort(), tag.peakRssiCdbm(), now, event.timestamp()));
             return;
         }
@@ -52,6 +70,22 @@ public class R700EventService {
             currentBest.peakRssiCdbm = tag.peakRssiCdbm();
             currentBest.seenAt = now;
             currentBest.timestamp = event.timestamp();
+        }
+    }
+
+    @Scheduled(fixedDelay = 1000)
+    public void flushExpiredPasses() {
+        Instant now = Instant.now();
+        Iterator<Map.Entry<String, BestRead>> iterator = strongestByPass.entrySet().iterator();
+
+        while (iterator.hasNext()) {
+            Map.Entry<String, BestRead> entry = iterator.next();
+            BestRead bestRead = entry.getValue();
+
+            if (isPassExpired(bestRead, now)) {
+                iterator.remove();
+                flushBestRead(bestRead);
+            }
         }
     }
 
@@ -64,7 +98,7 @@ public class R700EventService {
             return;
         }
 
-        Optional<RunnerEntity> runner = runnerRepository.findByRunnerID(bestRead.epcHex);
+        Optional<RunnerEntity> runner = runnerRepository.findByEpcHex(bestRead.epcHex);
 
         if (runner.isPresent()) {
             logger.info("[PASS] EPC: {} | Ant: {} | Strongest RSSI: {} dBm | Runner: {} | Timestamp: {}",
@@ -73,12 +107,7 @@ public class R700EventService {
                     bestRead.peakRssiCdbm / 100.0,
                     runner.get().getName(),
                     bestRead.timestamp);
-        } else {
-            logger.info("[PASS] EPC: {} | Ant: {} | Strongest RSSI: {} dBm | Timestamp: {}",
-                    bestRead.epcHex,
-                    bestRead.antennaPort,
-                    bestRead.peakRssiCdbm / 100.0,
-                    bestRead.timestamp);
+            lapRecordService.recordLap(bestRead.epcHex, bestRead.timestamp);
         }
     }
 

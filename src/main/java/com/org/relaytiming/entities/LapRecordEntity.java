@@ -18,7 +18,7 @@ public class LapRecordEntity {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "runner_id", nullable = false)
+    @JoinColumn(name = "runner_epc_hex", referencedColumnName = "epcHex", nullable = false)
     private RunnerEntity runner;
 
     @Column(nullable = false)
@@ -27,7 +27,7 @@ public class LapRecordEntity {
     @Column(nullable = false)
     private Integer runnerLapNumber;
 
-    @Column(nullable = false)
+    @Column(nullable = true)
     private Double lapTime;
 
     @Column(nullable = false)

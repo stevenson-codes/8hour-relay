@@ -26,7 +26,7 @@ public class TeamController {
 
 	@PostMapping
 	public ResponseEntity<TeamDTO> createTeam(@RequestBody TeamDTO request) {
-		TeamEntity savedTeam = teamRepository.save(new TeamEntity(request.id(), request.name()));
+		TeamEntity savedTeam = teamRepository.save(new TeamEntity(request.id(), null, request.name()));
 		return ResponseEntity.status(HttpStatus.CREATED).body(toDto(savedTeam));
 	}
 
