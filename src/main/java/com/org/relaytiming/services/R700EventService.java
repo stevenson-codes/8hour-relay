@@ -3,6 +3,7 @@ package com.org.relaytiming.services;
 import com.org.relaytiming.entities.RunnerEntity;
 import com.org.relaytiming.entities.TeamEntity;
 import com.org.relaytiming.mqtt.R700TagEvent;
+import com.org.relaytiming.repositories.RaceRepository;
 import com.org.relaytiming.repositories.RunnerRepository;
 import com.org.relaytiming.repositories.TeamRepository;
 
@@ -23,21 +24,29 @@ public class R700EventService {
 
     private static final Logger logger = LoggerFactory.getLogger(R700EventService.class);
     private static final Duration PASS_WINDOW = Duration.ofSeconds(30);
+    private static final Long RACE_ID = 1L;
 
     private final RunnerRepository runnerRepository;
     private final TeamRepository teamRepository;
+    private final RaceRepository raceRepository;
     private final LapRecordService lapRecordService;
     private final Map<String, BestRead> strongestByPass = new ConcurrentHashMap<>();
 
-    public R700EventService(RunnerRepository runnerRepository, TeamRepository teamRepository, LapRecordService lapRecordService) {
+    public R700EventService(RunnerRepository runnerRepository, TeamRepository teamRepository,
+            RaceRepository raceRepository, LapRecordService lapRecordService) {
         this.runnerRepository = runnerRepository;
         this.teamRepository = teamRepository;
+        this.raceRepository = raceRepository;
         this.lapRecordService = lapRecordService;
     }
 
     public void handleTagEvent(R700TagEvent event) {
         if (event == null || event.tagInventoryEvent() == null) {
             logger.warn("Received MQTT payload without tagInventoryEvent data");
+            return;
+        }
+
+        if (raceRepository.findById(RACE_ID).isEmpty()) {
             return;
         }
 
