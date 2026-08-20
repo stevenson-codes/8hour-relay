@@ -22,7 +22,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class R700EventService {
 
     private static final Logger logger = LoggerFactory.getLogger(R700EventService.class);
-    private static final Duration PASS_WINDOW = Duration.ofSeconds(10);
+    private static final Duration PASS_WINDOW = Duration.ofSeconds(30);
 
     private final RunnerRepository runnerRepository;
     private final TeamRepository teamRepository;

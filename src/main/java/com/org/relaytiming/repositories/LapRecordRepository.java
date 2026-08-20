@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 public interface LapRecordRepository extends JpaRepository<LapRecordEntity, Long> {
@@ -19,4 +20,6 @@ public interface LapRecordRepository extends JpaRepository<LapRecordEntity, Long
     Integer findMaxLapNumberByTeam(@Param("team") TeamEntity team);
 
     Optional<LapRecordEntity> findTopByTeamOrderByLapNumberDesc(TeamEntity team);
+
+    boolean existsByTeamAndTimestampBetween(TeamEntity team, LocalDateTime start, LocalDateTime end);
 }
