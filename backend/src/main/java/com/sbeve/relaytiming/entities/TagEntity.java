@@ -1,5 +1,5 @@
 package com.sbeve.relaytiming.entities;
-
+import jakarta.persistence.Table;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -7,6 +7,7 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.Id;
 
 @Entity
+@Table(name = "tags")
 public class TagEntity {
     @Id
     @Column(name = "epc_hex")
