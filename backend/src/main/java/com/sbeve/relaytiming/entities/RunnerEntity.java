@@ -2,6 +2,8 @@ package com.sbeve.relaytiming.entities;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -19,6 +21,10 @@ public class RunnerEntity {
     @Column(nullable = false)
     private String name;
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private RunnerStatus status;
+
     @OneToOne
     @JoinColumn(name = "epc_hex", nullable = false)
     private TagEntity tag;
@@ -26,8 +32,9 @@ public class RunnerEntity {
     public RunnerEntity() {
     }
 
-    public RunnerEntity(String name, TagEntity tag) {
+    public RunnerEntity(String name, RunnerStatus status, TagEntity tag) {
         this.name = name;
+        this.status = status;
         this.tag = tag;
     }
 
@@ -41,6 +48,14 @@ public class RunnerEntity {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public RunnerStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(RunnerStatus status) {
+        this.status = status;
     }
 
     public TagEntity getTag() {

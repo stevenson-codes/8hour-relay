@@ -9,9 +9,12 @@ import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
+
+import com.sbeve.relaytiming.services.TagReadService;
 
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
@@ -21,6 +24,11 @@ public class TagReadListener implements MqttCallback {
     private static final Logger log = LoggerFactory.getLogger(TagReadListener.class);
 
     private MqttClient mqttClient;
+    private final TagReadService tagReadService;
+
+    public TagReadListener(TagReadService tagReadService) {
+        this.tagReadService = tagReadService;
+    }
 
     @PostConstruct
     public void connect() throws MqttException {
@@ -50,8 +58,22 @@ public class TagReadListener implements MqttCallback {
 
     @Override
     public void messageArrived(String topic, MqttMessage message) {
-        String epcHex = new String(message.getPayload(), StandardCharsets.UTF_8);
-        log.info("Tag read received on '{}': {}", topic, epcHex);
+        String payload = new String(message.getPayload(), StandardCharsets.UTF_8);
+
+        JSONObject json;
+        try {
+            json = new JSONObject(payload);
+        } catch (Exception e) {
+            log.warn("Failed to parse tag event on '{}': {}", topic, payload, e);
+            return;
+        }
+
+        String timestamp = json.getString("timestamp");
+        JSONObject tagInventoryEvent = json.getJSONObject("tagInventoryEvent");
+        String epcHex = tagInventoryEvent.getString("epcHex");
+        int peakRssiCdbm = tagInventoryEvent.getInt("peakRssiCdbm");
+
+        tagReadService.handleTagRead(epcHex, timestamp, peakRssiCdbm);
     }
 
     @Override
