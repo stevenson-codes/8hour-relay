@@ -18,7 +18,7 @@ import jakarta.annotation.PreDestroy;
 
 @Service
 public class TagReadService {
-    private static final Logger logger = LoggerFactory.getLogger(TagReadService.class);
+    private static final Logger log = LoggerFactory.getLogger(TagReadService.class);
     private static final long WINDOW_SECONDS = 10;
 
     private final Map<String, Read> readWindow = new ConcurrentHashMap<>();
@@ -64,7 +64,7 @@ public class TagReadService {
                 return currentBest;
             }
 
-            logger.info("Tag {} strongest read in {}s window: {} cdBm", passKey, WINDOW_SECONDS, currentBest.peakRssiCdbm());
+            log.info("Tag {} strongest read in {}s window: {} cdBm", passKey, WINDOW_SECONDS, currentBest.peakRssiCdbm());
             lapRecordService.saveLapRecord(passKey, currentBest.timestamp());
             return null;
         });
