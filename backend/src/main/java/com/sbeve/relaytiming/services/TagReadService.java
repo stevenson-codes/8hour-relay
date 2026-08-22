@@ -24,14 +24,15 @@ public class TagReadService {
     private final Map<String, Read> readWindow = new ConcurrentHashMap<>();
     private final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
     private final TagRepository tagRepository;
+    private final LapRecordService lapRecordService;
 
-    public TagReadService(TagRepository tagRepository) {
+    public TagReadService(TagRepository tagRepository, LapRecordService lapRecordService) {
         this.tagRepository = tagRepository;
+        this.lapRecordService = lapRecordService;
     }
 
     public void handleTagRead(String epcHex, String timestamp, int peakRssiCdbm) {
         if (!tagRepository.existsById(epcHex)) {
-            logger.warn("Ignoring read from unknown tag {}", epcHex);
             return;
         }
 
@@ -42,11 +43,11 @@ public class TagReadService {
         readWindow.compute(passKey, (key, currentBest) -> {
             if (currentBest == null) {
                 windowOpened.set(true);
-                return new Read(now, peakRssiCdbm, now, timestamp);
+                return new Read(now, peakRssiCdbm, Instant.parse(timestamp));
             }
 
             if (peakRssiCdbm > currentBest.peakRssiCdbm()) {
-                return new Read(currentBest.windowStart(), peakRssiCdbm, now, timestamp);
+                return new Read(currentBest.windowStart(), peakRssiCdbm, Instant.parse(timestamp));
             }
 
             return currentBest;
@@ -64,7 +65,7 @@ public class TagReadService {
             }
 
             logger.info("Tag {} strongest read in {}s window: {} cdBm", passKey, WINDOW_SECONDS, currentBest.peakRssiCdbm());
-            // TODO: flush the read to the database or further processing
+            lapRecordService.saveLapRecord(passKey, currentBest.timestamp());
             return null;
         });
     }
@@ -77,7 +78,6 @@ public class TagReadService {
     private record Read(
         Instant windowStart, 
         int peakRssiCdbm, 
-        Instant seenAt, 
-        String timestamp) {
+        Instant timestamp) {
     }
 }
