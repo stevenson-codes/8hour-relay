@@ -13,6 +13,7 @@ import com.sbeve.relaytiming.entities.LapRecordEntity;
 import com.sbeve.relaytiming.entities.LapStatus;
 import com.sbeve.relaytiming.entities.TagEntity;
 import com.sbeve.relaytiming.entities.TagType;
+import com.sbeve.relaytiming.entities.TeamEntity;
 import com.sbeve.relaytiming.repositories.LapRecordRepository;
 import com.sbeve.relaytiming.repositories.TagRepository;
 import com.sbeve.relaytiming.repositories.RunnerRepository;
@@ -21,6 +22,7 @@ import com.sbeve.relaytiming.repositories.RunnerRepository;
 public class LapRecordService {
     private static final Logger log = LoggerFactory.getLogger(LapRecordService.class);
     private static final List<LapStatus> VALID_STATUSES = List.of(LapStatus.START, LapStatus.VALID);
+    private static final Duration HANDOFF_WINDOW = Duration.ofSeconds(1);
 
     private final LapRecordRepository lapRecordRepository;
     private final RunnerRepository runnerRepository;
@@ -36,18 +38,30 @@ public class LapRecordService {
         TagEntity tag = tagRepository.getReferenceById(epcHex);
 
         if (tag.getTagType() == TagType.RUNNER) {
-            Optional<RunnerEntity> runner = runnerRepository.findByTag(tag);
-            if (runner.isEmpty()) {
+            Optional<RunnerEntity> runnerOpt = runnerRepository.findByTag(tag);
+            if (runnerOpt.isEmpty()) {
                 log.atInfo().log("No runner found for tag {}", epcHex);
                 return;
             }
+            RunnerEntity runner = runnerOpt.get();
 
-            if (runner.get().getStatus() != RunnerStatus.ACTIVE) {
-                lapRecordRepository.save(new LapRecordEntity(tag, timestamp, null, LapStatus.INVALID));
+            if (runner.getStatus() != RunnerStatus.ACTIVE) {
+                LapRecordEntity lapRecord = new LapRecordEntity(tag, timestamp, null, LapStatus.INVALID);
+                lapRecordRepository.save(lapRecord);
+                checkHandoff(runner, lapRecord);
                 return;
             }
+
+            LapRecordEntity lapRecord = buildLapRecord(tag, timestamp);
+            lapRecordRepository.save(lapRecord);
+            checkHandoff(runner, lapRecord);
+            return;
         }
 
+        lapRecordRepository.save(buildLapRecord(tag, timestamp));
+    }
+
+    private LapRecordEntity buildLapRecord(TagEntity tag, Instant timestamp) {
         Optional<LapRecordEntity> previousLap = lapRecordRepository
                 .findTopByTagEpcHexAndStatusInOrderByTimestampDesc(tag.getEpcHex(), VALID_STATUSES);
 
@@ -60,7 +74,56 @@ public class LapRecordService {
         }
 
         log.atInfo().log("Saving lap record for tag {}: timestamp={}, lapTime={}, status={}",
-                epcHex, timestamp, lapRecord.getLapTime(), lapRecord.getStatus());
-        lapRecordRepository.save(lapRecord);
+                tag.getEpcHex(), timestamp, lapRecord.getLapTime(), lapRecord.getStatus());
+        return lapRecord;
+    }
+
+    private void checkHandoff(RunnerEntity runner, LapRecordEntity lapRecord) {
+        RunnerStatus runnerStatus = runner.getStatus();
+        Integer leg = runner.getLeg();
+        TeamEntity team = runner.getTeam();
+
+        Optional<RunnerEntity> counterpartOpt;
+        if (runnerStatus == RunnerStatus.ACTIVE) {
+            if (runnerRepository.existsByTeamAndLeg(team, leg + 1)) {
+                counterpartOpt = runnerRepository.findByTeamAndLeg(team, leg + 1);
+            } else {
+                counterpartOpt = runnerRepository.findByTeamAndLeg(team, 1);
+            }
+        } else {
+            counterpartOpt = runnerRepository.findByTeamAndStatusAndLeg(team, RunnerStatus.ACTIVE, leg - 1);
+        }
+
+        if (counterpartOpt.isEmpty()) {
+            return;
+        }
+        RunnerEntity counterpart = counterpartOpt.get();
+
+        Optional<LapRecordEntity> counterpartLap = lapRecordRepository
+                .findTopByTagEpcHexOrderByTimestampDesc(counterpart.getTag().getEpcHex());
+        if (counterpartLap.isEmpty()) {
+            return;
+        }
+
+        Duration gap = Duration.between(counterpartLap.get().getTimestamp(), lapRecord.getTimestamp()).abs();
+        if (gap.compareTo(HANDOFF_WINDOW) > 0) {
+            return;
+        }
+
+        RunnerEntity activeRunner = runner.getStatus() == RunnerStatus.ACTIVE ? runner : counterpart;
+        RunnerEntity nextRunner = runner.getStatus() == RunnerStatus.INACTIVE ? runner : counterpart;
+        LapRecordEntity nextLap = runner.getStatus() == RunnerStatus.INACTIVE ? lapRecord : counterpartLap.get();
+
+        nextLap.setStatus(LapStatus.START);
+        nextLap.setLapTime(null);
+        lapRecordRepository.save(nextLap);
+
+        activeRunner.setStatus(RunnerStatus.INACTIVE);
+        nextRunner.setStatus(RunnerStatus.ACTIVE);
+        runnerRepository.save(activeRunner);
+        runnerRepository.save(nextRunner);
+
+        log.atInfo().log("Handoff detected: {} (INACTIVE) -> {} (ACTIVE) at {}",
+                activeRunner.getName(), nextRunner.getName(), lapRecord.getTimestamp());
     }
 }

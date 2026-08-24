@@ -10,4 +10,5 @@ import com.sbeve.relaytiming.entities.LapStatus;
 
 public interface LapRecordRepository extends JpaRepository<LapRecordEntity, Long> {
     Optional<LapRecordEntity> findTopByTagEpcHexAndStatusInOrderByTimestampDesc(String epcHex, Collection<LapStatus> statuses);
+    Optional<LapRecordEntity> findTopByTagEpcHexOrderByTimestampDesc(String epcHex);
 }

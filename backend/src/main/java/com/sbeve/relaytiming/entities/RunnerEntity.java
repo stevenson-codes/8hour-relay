@@ -8,6 +8,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 
@@ -25,17 +26,26 @@ public class RunnerEntity {
     @Column(nullable = false)
     private RunnerStatus status;
 
+    @Column(nullable = false)
+    private Integer leg;
+
     @OneToOne
     @JoinColumn(name = "epc_hex", nullable = false)
     private TagEntity tag;
 
+    @ManyToOne
+    @JoinColumn(name = "team_id", nullable = false)
+    private TeamEntity team;
+
     public RunnerEntity() {
     }
 
-    public RunnerEntity(String name, RunnerStatus status, TagEntity tag) {
+    public RunnerEntity(String name, RunnerStatus status, Integer leg, TagEntity tag, TeamEntity team) {
         this.name = name;
         this.status = status;
+        this.leg = leg;
         this.tag = tag;
+        this.team = team;
     }
 
     public Long getId() {
@@ -58,11 +68,27 @@ public class RunnerEntity {
         this.status = status;
     }
 
+    public Integer getLeg() {
+        return leg;
+    }
+
+    public void setLeg(Integer leg) {
+        this.leg = leg;
+    }
+
     public TagEntity getTag() {
         return tag;
     }
 
     public void setTag(TagEntity tag) {
         this.tag = tag;
+    }
+
+    public TeamEntity getTeam() {
+        return team;
+    }
+
+    public void setTeam(TeamEntity team) {
+        this.team = team;
     }
 }
