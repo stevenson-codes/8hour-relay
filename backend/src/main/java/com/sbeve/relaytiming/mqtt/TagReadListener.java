@@ -14,6 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
+import com.sbeve.relaytiming.config.Config;
 import com.sbeve.relaytiming.services.TagReadService;
 
 import jakarta.annotation.PostConstruct;

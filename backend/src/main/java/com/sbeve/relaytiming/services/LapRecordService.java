@@ -9,6 +9,7 @@ import java.util.Optional;
 import org.springframework.stereotype.Service;
 import com.sbeve.relaytiming.entities.RunnerEntity;
 import com.sbeve.relaytiming.entities.RunnerStatus;
+import com.sbeve.relaytiming.config.Config;
 import com.sbeve.relaytiming.entities.LapRecordEntity;
 import com.sbeve.relaytiming.entities.LapStatus;
 import com.sbeve.relaytiming.entities.TagEntity;
@@ -22,7 +23,7 @@ import com.sbeve.relaytiming.repositories.RunnerRepository;
 public class LapRecordService {
     private static final Logger log = LoggerFactory.getLogger(LapRecordService.class);
     private static final List<LapStatus> VALID_STATUSES = List.of(LapStatus.START, LapStatus.VALID);
-    private static final Duration HANDOFF_WINDOW = Duration.ofSeconds(1);
+    private static final Duration HANDOFF_WINDOW = Duration.ofSeconds(Config.HANDOFF_WINDOW);
 
     private final LapRecordRepository lapRecordRepository;
     private final RunnerRepository runnerRepository;

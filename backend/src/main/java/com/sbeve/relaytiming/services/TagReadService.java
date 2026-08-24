@@ -1,5 +1,6 @@
 package com.sbeve.relaytiming.services;
 
+import com.sbeve.relaytiming.config.Config;
 import java.time.Instant;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -19,7 +20,7 @@ import jakarta.annotation.PreDestroy;
 @Service
 public class TagReadService {
     private static final Logger log = LoggerFactory.getLogger(TagReadService.class);
-    private static final long WINDOW_SECONDS = 10;
+    private static final long READ_WINDOW = Config.READ_WINDOW;
 
     private final Map<String, Read> readWindow = new ConcurrentHashMap<>();
     private final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
@@ -54,7 +55,7 @@ public class TagReadService {
         });
 
         if (windowOpened.get()) {
-            scheduler.schedule(() -> flushRead(passKey, now), WINDOW_SECONDS, TimeUnit.SECONDS);
+            scheduler.schedule(() -> flushRead(passKey, now), READ_WINDOW, TimeUnit.SECONDS);
         }
     }
 
@@ -64,7 +65,7 @@ public class TagReadService {
                 return currentBest;
             }
 
-            log.info("Tag {} strongest read in {}s window: {} cdBm", passKey, WINDOW_SECONDS, currentBest.peakRssiCdbm());
+            log.info("Tag {} strongest read in {}s window: {} cdBm", passKey, READ_WINDOW, currentBest.peakRssiCdbm());
             lapRecordService.saveLapRecord(passKey, currentBest.timestamp());
             return null;
         });
