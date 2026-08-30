@@ -26,13 +26,20 @@ public class TagReadService {
     private final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
     private final TagRepository tagRepository;
     private final LapRecordService lapRecordService;
+    private final RaceStateService raceStateService;
 
-    public TagReadService(TagRepository tagRepository, LapRecordService lapRecordService) {
+    public TagReadService(TagRepository tagRepository, LapRecordService lapRecordService,
+            RaceStateService raceStateService) {
         this.tagRepository = tagRepository;
         this.lapRecordService = lapRecordService;
+        this.raceStateService = raceStateService;
     }
 
     public void handleTagRead(String epcHex, String timestamp, int peakRssiCdbm) {
+        if (!raceStateService.isActive()) {
+            return;
+        }
+
         if (!tagRepository.existsById(epcHex)) {
             return;
         }

@@ -11,6 +11,58 @@
   }
 }
 
+.race-controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.race-status {
+  font-size: 13px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 4px 10px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+
+  &.active {
+    color: #1f9d55;
+    border-color: #1f9d55;
+  }
+
+  &.inactive {
+    color: var(--text);
+  }
+}
+
+.start-button,
+.stop-button {
+  padding: 8px 20px;
+  border-radius: 6px;
+  border: none;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}
+
+.start-button {
+  background: #1f9d55;
+  color: #fff;
+}
+
+.stop-button {
+  background: #d64545;
+  color: #fff;
+}
+
 #teams {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
