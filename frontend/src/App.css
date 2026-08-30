@@ -39,7 +39,8 @@
 }
 
 .start-button,
-.stop-button {
+.stop-button,
+.clear-button {
   padding: 8px 20px;
   border-radius: 6px;
   border: none;
@@ -61,6 +62,12 @@
 .stop-button {
   background: #d64545;
   color: #fff;
+}
+
+.clear-button {
+  background: transparent;
+  color: var(--text);
+  border: 1px solid var(--border);
 }
 
 #teams {

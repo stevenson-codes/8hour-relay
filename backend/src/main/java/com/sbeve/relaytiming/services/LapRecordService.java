@@ -36,6 +36,11 @@ public class LapRecordService {
         this.tagRepository = tagRepository;
     }
 
+    public void clearAllLapRecords() {
+        lapRecordRepository.deleteAll();
+        log.atInfo().log("Cleared all lap records");
+    }
+
     public void saveLapRecord(String epcHex, Instant timestamp) {
         Optional<TagEntity> tagOpt = tagRepository.findById(epcHex);
         if (tagOpt.isEmpty()) {
