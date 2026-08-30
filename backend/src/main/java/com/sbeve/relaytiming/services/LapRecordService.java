@@ -24,6 +24,7 @@ public class LapRecordService {
     private static final Logger log = LoggerFactory.getLogger(LapRecordService.class);
     private static final List<LapStatus> VALID_STATUSES = List.of(LapStatus.START, LapStatus.VALID);
     private static final Duration HANDOFF_WINDOW = Duration.ofSeconds(Config.HANDOFF_WINDOW);
+    private static final Duration LAP_TIMEOUT = Duration.ofMinutes(Config.LAP_TIMEOUT);
 
     private final LapRecordRepository lapRecordRepository;
     private final RunnerRepository runnerRepository;
@@ -36,7 +37,12 @@ public class LapRecordService {
     }
 
     public void saveLapRecord(String epcHex, Instant timestamp) {
-        TagEntity tag = tagRepository.getReferenceById(epcHex);
+        Optional<TagEntity> tagOpt = tagRepository.findById(epcHex);
+        if (tagOpt.isEmpty()) {
+            log.atInfo().log("No tag found for epcHex {}", epcHex);
+            return;
+        }
+        TagEntity tag = tagOpt.get();
 
         if (tag.getTagType() == TagType.RUNNER) {
             Optional<RunnerEntity> runnerOpt = runnerRepository.findByTag(tag);
@@ -92,13 +98,25 @@ public class LapRecordService {
                 counterpartOpt = runnerRepository.findByTeamAndLeg(team, 1);
             }
         } else {
-            counterpartOpt = runnerRepository.findByTeamAndStatusAndLeg(team, RunnerStatus.ACTIVE, leg - 1);
+            int prevLeg = leg > 1 ? leg - 1 : runnerRepository.countByTeam(team);
+            counterpartOpt = runnerRepository.findByTeamAndStatusAndLeg(team, RunnerStatus.ACTIVE, prevLeg);
         }
 
         if (counterpartOpt.isEmpty()) {
             return;
         }
         RunnerEntity counterpart = counterpartOpt.get();
+
+        RunnerEntity activeRunner = runnerStatus == RunnerStatus.ACTIVE ? runner : counterpart;
+        Optional<LapRecordEntity> activeRunnerStart = lapRecordRepository
+                .findTopByTagAndStatusOrderByTimestampDesc(activeRunner.getTag(), LapStatus.START);
+        if (activeRunnerStart.isEmpty()) {
+            return;
+        }
+        Duration sinceStart = Duration.between(activeRunnerStart.get().getTimestamp(), lapRecord.getTimestamp());
+        if (sinceStart.compareTo(LAP_TIMEOUT) < 0) {
+            return;
+        }
 
         Optional<LapRecordEntity> counterpartLap = lapRecordRepository
                 .findTopByTagEpcHexOrderByTimestampDesc(counterpart.getTag().getEpcHex());
@@ -111,9 +129,8 @@ public class LapRecordService {
             return;
         }
 
-        RunnerEntity activeRunner = runner.getStatus() == RunnerStatus.ACTIVE ? runner : counterpart;
-        RunnerEntity nextRunner = runner.getStatus() == RunnerStatus.INACTIVE ? runner : counterpart;
-        LapRecordEntity nextLap = runner.getStatus() == RunnerStatus.INACTIVE ? lapRecord : counterpartLap.get();
+        RunnerEntity nextRunner = runnerStatus == RunnerStatus.INACTIVE ? runner : counterpart;
+        LapRecordEntity nextLap = runnerStatus == RunnerStatus.INACTIVE ? lapRecord : counterpartLap.get();
 
         nextLap.setStatus(LapStatus.START);
         nextLap.setLapTime(null);

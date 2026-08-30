@@ -63,18 +63,16 @@ public class TagReadListener implements MqttCallback {
 
         JSONObject json;
         try {
-            json = new JSONObject(payload);
+            json = new JSONObject(payload);        String timestamp = json.getString("timestamp");
+            JSONObject tagInventoryEvent = json.getJSONObject("tagInventoryEvent");
+            String epcHex = tagInventoryEvent.getString("epcHex");
+            int peakRssiCdbm = tagInventoryEvent.getInt("peakRssiCdbm");
+
+            tagReadService.handleTagRead(epcHex, timestamp, peakRssiCdbm);
         } catch (Exception e) {
             log.warn("Failed to parse tag event on '{}': {}", topic, payload, e);
             return;
         }
-
-        String timestamp = json.getString("timestamp");
-        JSONObject tagInventoryEvent = json.getJSONObject("tagInventoryEvent");
-        String epcHex = tagInventoryEvent.getString("epcHex");
-        int peakRssiCdbm = tagInventoryEvent.getInt("peakRssiCdbm");
-
-        tagReadService.handleTagRead(epcHex, timestamp, peakRssiCdbm);
     }
 
     @Override
