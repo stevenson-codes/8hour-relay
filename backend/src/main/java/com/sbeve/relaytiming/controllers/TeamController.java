@@ -2,6 +2,7 @@ package com.sbeve.relaytiming.controllers;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -14,15 +15,18 @@ import com.sbeve.relaytiming.requests.CreateRunnerRequest;
 import com.sbeve.relaytiming.requests.CreateRunnerResponse;
 import com.sbeve.relaytiming.requests.CreateTeamRequest;
 import com.sbeve.relaytiming.requests.CreateTeamResponse;
+import com.sbeve.relaytiming.services.RaceStateService;
 import com.sbeve.relaytiming.services.TeamService;
 
 @RestController
 @RequestMapping("/api/teams")
 public class TeamController {
     private final TeamService teamService;
+    private final RaceStateService raceStateService;
 
-    public TeamController(TeamService teamService) {
+    public TeamController(TeamService teamService, RaceStateService raceStateService) {
         this.teamService = teamService;
+        this.raceStateService = raceStateService;
     }
 
     @PostMapping
@@ -41,5 +45,15 @@ public class TeamController {
                 runner.getBib(), runner.getSex() == null ? null : runner.getSex().name(),
                 runner.getStatus().name(), teamId);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
+
+    @DeleteMapping
+    public ResponseEntity<Void> wipeAll() {
+        if (raceStateService.isActive()) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).build();
+        }
+
+        teamService.wipeAll();
+        return ResponseEntity.noContent().build();
     }
 }

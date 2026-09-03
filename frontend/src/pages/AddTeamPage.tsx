@@ -38,6 +38,11 @@ function AddTeamPage() {
     e.preventDefault()
     if (teamPending) return
 
+    if (!teamName.trim() || !teamEpcHex.trim()) {
+      setTeamError('Please fill out all required fields.')
+      return
+    }
+
     setTeamPending(true)
     setTeamError(null)
     postJson<CreateTeamResponse>('/api/teams', {
@@ -56,6 +61,11 @@ function AddTeamPage() {
   function handleAddRunner(e: FormEvent) {
     e.preventDefault()
     if (runnerPending || team === null) return
+
+    if (!runnerName.trim() || !runnerLeg.trim() || !runnerEpcHex.trim()) {
+      setRunnerError('Please fill out all required fields.')
+      return
+    }
 
     setRunnerPending(true)
     setRunnerError(null)
@@ -128,7 +138,7 @@ function AddTeamPage() {
               </button>
             </div>
           ) : (
-            <form onSubmit={handleCreateTeam} className="admin-form">
+            <form onSubmit={handleCreateTeam} className="admin-form" noValidate>
               <label className="form-field">
                 <span>Team Name</span>
                 <input
@@ -172,7 +182,7 @@ function AddTeamPage() {
             <p className="board-status">Create the team first.</p>
           ) : (
             <>
-              <form onSubmit={handleAddRunner} className="admin-form admin-form-row">
+              <form onSubmit={handleAddRunner} className="admin-form admin-form-row" noValidate>
                 <label className="form-field">
                   <span>Name</span>
                   <input

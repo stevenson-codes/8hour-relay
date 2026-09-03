@@ -3,6 +3,8 @@ package com.sbeve.relaytiming.services;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import com.sbeve.relaytiming.entities.RunnerEntity;
@@ -11,6 +13,7 @@ import com.sbeve.relaytiming.entities.TeamEntity;
 import com.sbeve.relaytiming.entities.enums.RunnerStatus;
 import com.sbeve.relaytiming.entities.enums.Sex;
 import com.sbeve.relaytiming.entities.enums.TagType;
+import com.sbeve.relaytiming.repositories.LapRecordRepository;
 import com.sbeve.relaytiming.repositories.RunnerRepository;
 import com.sbeve.relaytiming.repositories.TagRepository;
 import com.sbeve.relaytiming.repositories.TeamRepository;
@@ -19,15 +22,19 @@ import com.sbeve.relaytiming.requests.CreateTeamRequest;
 
 @Service
 public class TeamService {
+    private static final Logger log = LoggerFactory.getLogger(TeamService.class);
+
     private final TeamRepository teamRepository;
     private final RunnerRepository runnerRepository;
     private final TagRepository tagRepository;
+    private final LapRecordRepository lapRecordRepository;
 
     public TeamService(TeamRepository teamRepository, RunnerRepository runnerRepository,
-            TagRepository tagRepository) {
+            TagRepository tagRepository, LapRecordRepository lapRecordRepository) {
         this.teamRepository = teamRepository;
         this.runnerRepository = runnerRepository;
         this.tagRepository = tagRepository;
+        this.lapRecordRepository = lapRecordRepository;
     }
 
     public TeamEntity createTeam(CreateTeamRequest request) {
@@ -71,6 +78,14 @@ public class TeamService {
         runner.setBib(blankToNull(request.bib()));
         runner.setSex(sex);
         return runnerRepository.save(runner);
+    }
+
+    public void wipeAll() {
+        lapRecordRepository.deleteAll();
+        runnerRepository.deleteAll();
+        teamRepository.deleteAll();
+        tagRepository.deleteAll();
+        log.atInfo().log("Wiped all teams, runners, tags, and lap records");
     }
 
     private TagEntity resolveTag(String epcHex, TagType expectedType) {
