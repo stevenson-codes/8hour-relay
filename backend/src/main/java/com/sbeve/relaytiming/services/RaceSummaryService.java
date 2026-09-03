@@ -15,13 +15,15 @@ import com.sbeve.relaytiming.dto.RunnerSummaryDto;
 import com.sbeve.relaytiming.dto.RunnerDto;
 import com.sbeve.relaytiming.dto.TeamSummaryDto;
 import com.sbeve.relaytiming.entities.LapRecordEntity;
-import com.sbeve.relaytiming.entities.LapStatus;
 import com.sbeve.relaytiming.entities.RunnerEntity;
-import com.sbeve.relaytiming.entities.RunnerStatus;
 import com.sbeve.relaytiming.entities.TeamEntity;
+import com.sbeve.relaytiming.entities.enums.LapStatus;
+import com.sbeve.relaytiming.entities.enums.RunnerStatus;
 import com.sbeve.relaytiming.repositories.LapRecordRepository;
 import com.sbeve.relaytiming.repositories.RunnerRepository;
 import com.sbeve.relaytiming.repositories.TeamRepository;
+import com.sbeve.relaytiming.services.records.RunnerAgg;
+import com.sbeve.relaytiming.services.records.TeamAgg;
 
 @Service
 public class RaceSummaryService {

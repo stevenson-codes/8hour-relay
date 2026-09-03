@@ -1,10 +1,10 @@
-package com.sbeve.relaytiming.services;
+package com.sbeve.relaytiming.services.records;
 
 import java.time.Instant;
 
 import com.sbeve.relaytiming.entities.RunnerEntity;
 
-record RunnerAgg(
+public record RunnerAgg(
         RunnerEntity runner,
         int laps,
         Long lastLapMillis,

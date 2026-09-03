@@ -7,8 +7,8 @@ import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import com.sbeve.relaytiming.entities.LapRecordEntity;
-import com.sbeve.relaytiming.entities.LapStatus;
 import com.sbeve.relaytiming.entities.TagEntity;
+import com.sbeve.relaytiming.entities.enums.LapStatus;
 
 public interface LapRecordRepository extends JpaRepository<LapRecordEntity, Long> {
     Optional<LapRecordEntity> findTopByTagEpcHexAndStatusInOrderByTimestampDesc(String epcHex, Collection<LapStatus> statuses);

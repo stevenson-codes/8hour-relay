@@ -1,4 +1,4 @@
-package com.sbeve.relaytiming.entities;
+package com.sbeve.relaytiming.entities.enums;
 
 public enum RunnerStatus {
     ACTIVE,

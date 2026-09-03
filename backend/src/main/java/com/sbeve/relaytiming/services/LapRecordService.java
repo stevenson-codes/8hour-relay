@@ -8,13 +8,13 @@ import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 import com.sbeve.relaytiming.entities.RunnerEntity;
-import com.sbeve.relaytiming.entities.RunnerStatus;
 import com.sbeve.relaytiming.config.Config;
 import com.sbeve.relaytiming.entities.LapRecordEntity;
-import com.sbeve.relaytiming.entities.LapStatus;
 import com.sbeve.relaytiming.entities.TagEntity;
-import com.sbeve.relaytiming.entities.TagType;
 import com.sbeve.relaytiming.entities.TeamEntity;
+import com.sbeve.relaytiming.entities.enums.LapStatus;
+import com.sbeve.relaytiming.entities.enums.RunnerStatus;
+import com.sbeve.relaytiming.entities.enums.TagType;
 import com.sbeve.relaytiming.repositories.LapRecordRepository;
 import com.sbeve.relaytiming.repositories.TagRepository;
 import com.sbeve.relaytiming.repositories.RunnerRepository;

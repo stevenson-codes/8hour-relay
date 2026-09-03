@@ -2,6 +2,8 @@ package com.sbeve.relaytiming.entities;
 
 import java.time.Instant;
 
+import com.sbeve.relaytiming.entities.enums.LapStatus;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;

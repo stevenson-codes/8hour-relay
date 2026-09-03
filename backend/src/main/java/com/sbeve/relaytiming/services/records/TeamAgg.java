@@ -1,10 +1,10 @@
-package com.sbeve.relaytiming.services;
+package com.sbeve.relaytiming.services.records;
 
 import java.util.List;
 
 import com.sbeve.relaytiming.entities.TeamEntity;
 
-record TeamAgg(
+public record TeamAgg(
         TeamEntity team,
         List<RunnerAgg> runners,
         int totalLaps,

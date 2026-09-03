@@ -1,0 +1,112 @@
+.nav-link-button {
+  color: var(--cyan);
+
+  &:hover {
+    border-color: var(--cyan);
+  }
+}
+
+.add-team-page {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 20px 28px 48px;
+  max-width: 900px;
+}
+
+.form-card {
+  background: var(--card-bg);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 20px;
+
+  h2 {
+    margin: 0 0 16px;
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--ink);
+  }
+}
+
+.form-card[aria-disabled='true'] {
+  opacity: 0.6;
+}
+
+.admin-form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  max-width: 420px;
+}
+
+.admin-form-row {
+  max-width: none;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: flex-end;
+}
+
+.admin-form-row .form-field {
+  flex: 1 1 200px;
+}
+
+.form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+
+  span {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  input,
+  select {
+    background: var(--card-bg-alt);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    padding: 8px 10px;
+    color: var(--ink);
+    font-size: 14px;
+    font-family: inherit;
+
+    &:focus {
+      outline: none;
+      border-color: var(--cyan);
+    }
+  }
+}
+
+.form-field-narrow {
+  flex: 0 1 110px;
+}
+
+.form-error {
+  margin: 0;
+  color: var(--red);
+  font-size: 13px;
+}
+
+.form-summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+
+  p {
+    margin: 0;
+    color: var(--ink);
+  }
+
+  code {
+    color: var(--muted);
+  }
+}
+
+.admin-added-table {
+  margin-top: 20px;
+}

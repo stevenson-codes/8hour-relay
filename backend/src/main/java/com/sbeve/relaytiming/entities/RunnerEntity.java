@@ -1,5 +1,8 @@
 package com.sbeve.relaytiming.entities;
 
+import com.sbeve.relaytiming.entities.enums.RunnerStatus;
+import com.sbeve.relaytiming.entities.enums.Sex;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;

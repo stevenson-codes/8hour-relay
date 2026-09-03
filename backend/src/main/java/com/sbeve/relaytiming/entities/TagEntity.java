@@ -1,4 +1,5 @@
 package com.sbeve.relaytiming.entities;
+import com.sbeve.relaytiming.entities.enums.TagType;
 import jakarta.persistence.Table;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
