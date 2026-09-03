@@ -29,6 +29,13 @@ public class RunnerEntity {
     @Column(nullable = false)
     private Integer leg;
 
+    @Column(name = "bib")
+    private String bib;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "sex")
+    private Sex sex;
+
     @OneToOne
     @JoinColumn(name = "epc_hex", nullable = false)
     private TagEntity tag;
@@ -74,6 +81,22 @@ public class RunnerEntity {
 
     public void setLeg(Integer leg) {
         this.leg = leg;
+    }
+
+    public String getBib() {
+        return bib;
+    }
+
+    public void setBib(String bib) {
+        this.bib = bib;
+    }
+
+    public Sex getSex() {
+        return sex;
+    }
+
+    public void setSex(Sex sex) {
+        this.sex = sex;
     }
 
     public TagEntity getTag() {

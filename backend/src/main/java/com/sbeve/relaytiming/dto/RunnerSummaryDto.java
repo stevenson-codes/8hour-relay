@@ -1,12 +1,19 @@
 package com.sbeve.relaytiming.dto;
 
-import com.sbeve.relaytiming.entities.RunnerStatus;
+import java.time.Instant;
 
 public record RunnerSummaryDto(
-        Long id,
+        int leg,
         String name,
-        Integer leg,
-        RunnerStatus status,
-        int lapsCompleted,
-        Long avgLapTimeMillis) {
+        String bib,
+        String sex,
+        String status,
+        String statusLabel,
+        int laps,
+        double distanceKm,
+        Long lastLapMillis,
+        Long bestLapMillis,
+        Long avgPaceSecPerKm,
+        Instant legStart,
+        Instant legEnd) {
 }

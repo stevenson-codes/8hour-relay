@@ -19,6 +19,9 @@ public class TeamEntity {
     @Column(nullable = false)
     private String name;
 
+    @Column(name = "division")
+    private String division;
+
     @OneToOne
     @JoinColumn(name = "epc_hex", nullable = false)
     private TagEntity tag;
@@ -41,6 +44,14 @@ public class TeamEntity {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getDivision() {
+        return division;
+    }
+
+    public void setDivision(String division) {
+        this.division = division;
     }
 
     public TagEntity getTag() {

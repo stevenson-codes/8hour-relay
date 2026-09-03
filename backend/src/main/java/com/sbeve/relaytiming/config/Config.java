@@ -8,6 +8,7 @@ public class Config {
     public static final Long HANDOFF_WINDOW = 500L;
     public static final Long READ_WINDOW = 5L;
     public static final Long LAP_TIMEOUT = 1L;
+    public static final double LAP_DISTANCE_KM = 0.4;
 
     private Config() {
     }
