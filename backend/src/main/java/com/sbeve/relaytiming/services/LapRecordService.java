@@ -23,7 +23,7 @@ import com.sbeve.relaytiming.repositories.RunnerRepository;
 public class LapRecordService {
     private static final Logger log = LoggerFactory.getLogger(LapRecordService.class);
     private static final List<LapStatus> VALID_STATUSES = List.of(LapStatus.START, LapStatus.VALID);
-    private static final Duration HANDOFF_WINDOW = Duration.ofSeconds(Config.HANDOFF_WINDOW);
+    private static final Duration HANDOFF_WINDOW = Duration.ofMillis(Config.HANDOFF_WINDOW);
     private static final Duration LAP_TIMEOUT = Duration.ofMinutes(Config.LAP_TIMEOUT);
 
     private final LapRecordRepository lapRecordRepository;
