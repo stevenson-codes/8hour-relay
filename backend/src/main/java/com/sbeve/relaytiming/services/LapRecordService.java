@@ -24,16 +24,21 @@ public class LapRecordService {
     private static final Logger log = LoggerFactory.getLogger(LapRecordService.class);
     private static final List<LapStatus> VALID_STATUSES = List.of(LapStatus.START, LapStatus.VALID);
     private static final Duration HANDOFF_WINDOW = Duration.ofMillis(Config.HANDOFF_WINDOW);
-    private static final Duration LAP_TIMEOUT = Duration.ofMinutes(Config.LAP_TIMEOUT);
+    private static final Duration HANDOFF_ENABLED_WINDOW = Duration.ofMinutes(Config.HANDOFF_ENABLED_WINDOW);
+    private static final Duration LEG_TIME = Duration.ofMinutes(Config.LEG_TIME);
+    private static final Duration LEG_TIMEOUT = Duration.ofMinutes(Config.LEG_TIMEOUT);
 
     private final LapRecordRepository lapRecordRepository;
     private final RunnerRepository runnerRepository;
     private final TagRepository tagRepository;
+    private final RaceStateService raceStateService;
 
-    public LapRecordService(LapRecordRepository lapRecordRepository, RunnerRepository runnerRepository, TagRepository tagRepository) {
+    public LapRecordService(LapRecordRepository lapRecordRepository, RunnerRepository runnerRepository,
+            TagRepository tagRepository, RaceStateService raceStateService) {
         this.lapRecordRepository = lapRecordRepository;
         this.runnerRepository = runnerRepository;
         this.tagRepository = tagRepository;
+        this.raceStateService = raceStateService;
     }
 
     public void clearAllLapRecords() {
@@ -78,7 +83,8 @@ public class LapRecordService {
                 .findTopByTagEpcHexAndStatusInOrderByTimestampDesc(tag.getEpcHex(), VALID_STATUSES);
 
         LapRecordEntity lapRecord;
-        if (previousLap.isEmpty()) {
+        if (previousLap.isEmpty()
+                || Duration.between(previousLap.get().getTimestamp(), timestamp).compareTo(LEG_TIMEOUT) > 0) {
             lapRecord = new LapRecordEntity(tag, timestamp, null, LapStatus.START);
         } else {
             long lapTime = Duration.between(previousLap.get().getTimestamp(), timestamp).toMillis();
@@ -113,13 +119,15 @@ public class LapRecordService {
         RunnerEntity counterpart = counterpartOpt.get();
 
         RunnerEntity activeRunner = runnerStatus == RunnerStatus.ACTIVE ? runner : counterpart;
-        Optional<LapRecordEntity> activeRunnerStart = lapRecordRepository
-                .findTopByTagAndStatusOrderByTimestampDesc(activeRunner.getTag(), LapStatus.START);
-        if (activeRunnerStart.isEmpty()) {
+
+        Instant raceStart = raceStateService.getStartedAt();
+        if (raceStart == null || lapRecord.getTimestamp().isBefore(raceStart)) {
             return;
         }
-        Duration sinceStart = Duration.between(activeRunnerStart.get().getTimestamp(), lapRecord.getTimestamp());
-        if (sinceStart.compareTo(LAP_TIMEOUT) < 0) {
+        Duration sinceRaceStart = Duration.between(raceStart, lapRecord.getTimestamp());
+        long sinceLegStartMillis = sinceRaceStart.toMillis() % LEG_TIME.toMillis();
+        Duration untilNextLegStart = LEG_TIME.minusMillis(sinceLegStartMillis);
+        if (untilNextLegStart.compareTo(HANDOFF_ENABLED_WINDOW) > 0) {
             return;
         }
 
