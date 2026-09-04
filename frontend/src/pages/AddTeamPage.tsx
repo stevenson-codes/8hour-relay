@@ -38,7 +38,7 @@ function AddTeamPage() {
     e.preventDefault()
     if (teamPending) return
 
-    if (!teamName.trim() || !teamEpcHex.trim()) {
+    if (!teamName.trim() || !teamDivision.trim() || !teamEpcHex.trim()) {
       setTeamError('Please fill out all required fields.')
       return
     }
@@ -47,7 +47,7 @@ function AddTeamPage() {
     setTeamError(null)
     postJson<CreateTeamResponse>('/api/teams', {
       name: teamName,
-      division: teamDivision || null,
+      division: teamDivision,
       epcHex: teamEpcHex,
     })
       .then((created) => {
@@ -62,7 +62,7 @@ function AddTeamPage() {
     e.preventDefault()
     if (runnerPending || team === null) return
 
-    if (!runnerName.trim() || !runnerLeg.trim() || !runnerEpcHex.trim()) {
+    if (!runnerName.trim() || !runnerLeg.trim() || !runnerBib.trim() || !runnerSex.trim() || !runnerEpcHex.trim()) {
       setRunnerError('Please fill out all required fields.')
       return
     }
@@ -72,8 +72,8 @@ function AddTeamPage() {
     postJson<CreateRunnerResponse>(`/api/teams/${team.id}/runners`, {
       name: runnerName,
       leg: Number(runnerLeg),
-      bib: runnerBib || null,
-      sex: runnerSex || null,
+      bib: runnerBib,
+      sex: runnerSex,
       epcHex: runnerEpcHex,
     })
       .then((created) => {
@@ -129,10 +129,11 @@ function AddTeamPage() {
           <h2>1. Team Details</h2>
           {team ? (
             <div className="form-summary">
-              <p>
-                <strong>{team.name}</strong> {team.division && <span>({team.division})</span>} — tag{' '}
-                <code>{team.epcHex}</code>
-              </p>
+              <div className="team-summary-info">
+                <p className="team-summary-name">{team.name}</p>
+                {team.division && <p className="team-summary-division">{team.division}</p>}
+                {team.epcHex && <p className="team-summary-tag">Tag: {team.epcHex}</p>}
+              </div>
               <button type="button" className="clear-button" onClick={handleStartOver}>
                 Start Over / Add Another Team
               </button>
@@ -150,11 +151,12 @@ function AddTeamPage() {
                 />
               </label>
               <label className="form-field">
-                <span>Division (optional)</span>
+                <span>Division</span>
                 <input
                   type="text"
                   value={teamDivision}
                   onChange={(e) => setTeamDivision(e.target.value)}
+                  required
                   placeholder="Open"
                 />
               </label>
@@ -204,13 +206,21 @@ function AddTeamPage() {
                   />
                 </label>
                 <label className="form-field form-field-narrow">
-                  <span>Bib (optional)</span>
-                  <input type="text" value={runnerBib} onChange={(e) => setRunnerBib(e.target.value)} placeholder="A01" />
+                  <span>Bib</span>
+                  <input
+                    type="text"
+                    value={runnerBib}
+                    onChange={(e) => setRunnerBib(e.target.value)}
+                    required
+                    placeholder="A01"
+                  />
                 </label>
                 <label className="form-field form-field-narrow">
-                  <span>Sex (optional)</span>
-                  <select value={runnerSex} onChange={(e) => setRunnerSex(e.target.value)}>
-                    <option value="">—</option>
+                  <span>Sex</span>
+                  <select value={runnerSex} onChange={(e) => setRunnerSex(e.target.value)} required>
+                    <option value="" disabled>
+                      Select…
+                    </option>
                     <option value="M">M</option>
                     <option value="F">F</option>
                   </select>

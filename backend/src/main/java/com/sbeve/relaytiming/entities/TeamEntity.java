@@ -19,7 +19,7 @@ public class TeamEntity {
     @Column(nullable = false)
     private String name;
 
-    @Column(name = "division")
+    @Column(name = "division", nullable = false)
     private String division;
 
     @OneToOne

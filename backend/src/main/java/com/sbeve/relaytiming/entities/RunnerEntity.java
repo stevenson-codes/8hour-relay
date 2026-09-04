@@ -32,11 +32,11 @@ public class RunnerEntity {
     @Column(nullable = false)
     private Integer leg;
 
-    @Column(name = "bib")
+    @Column(name = "bib", nullable = false)
     private String bib;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "sex")
+    @Column(name = "sex", nullable = false)
     private Sex sex;
 
     @OneToOne

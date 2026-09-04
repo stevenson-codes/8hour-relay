@@ -97,15 +97,35 @@
   justify-content: space-between;
   gap: 16px;
   flex-wrap: wrap;
+}
 
-  p {
-    margin: 0;
-    color: var(--ink);
-  }
+.team-summary-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
 
-  code {
-    color: var(--muted);
-  }
+.team-summary-name {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.team-summary-division {
+  margin: 0;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--cyan);
+}
+
+.team-summary-tag {
+  margin: 0;
+  font-size: 11px;
+  font-family: monospace;
+  color: var(--muted);
 }
 
 .admin-added-table {

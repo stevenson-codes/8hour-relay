@@ -41,6 +41,9 @@ public class TeamService {
         if (request.name() == null || request.name().isBlank()) {
             throw new IllegalArgumentException("Team name is required");
         }
+        if (request.division() == null || request.division().isBlank()) {
+            throw new IllegalArgumentException("Division is required");
+        }
 
         TagEntity tag = resolveTag(request.epcHex(), TagType.TEAM);
         if (teamRepository.existsByTag(tag)) {
@@ -48,7 +51,7 @@ public class TeamService {
         }
 
         TeamEntity team = new TeamEntity(request.name(), tag);
-        team.setDivision(blankToNull(request.division()));
+        team.setDivision(request.division());
         return teamRepository.save(team);
     }
 
@@ -65,7 +68,12 @@ public class TeamService {
         if (runnerRepository.existsByTeamAndLeg(team, request.leg())) {
             throw new IllegalStateException("Team already has a runner at leg " + request.leg());
         }
-
+        if (request.bib() == null || request.bib().isBlank()) {
+            throw new IllegalArgumentException("bib is required");
+        }
+        if (request.sex() == null || request.sex().isBlank()) {
+            throw new IllegalArgumentException("sex is required");
+        }
         Sex sex = parseSex(request.sex());
 
         TagEntity tag = resolveTag(request.epcHex(), TagType.RUNNER);
@@ -75,7 +83,7 @@ public class TeamService {
 
         RunnerStatus status = request.leg() == 1 ? RunnerStatus.ACTIVE : RunnerStatus.INACTIVE;
         RunnerEntity runner = new RunnerEntity(request.name(), status, request.leg(), tag, team);
-        runner.setBib(blankToNull(request.bib()));
+        runner.setBib(request.bib());
         runner.setSex(sex);
         return runnerRepository.save(runner);
     }
@@ -106,17 +114,10 @@ public class TeamService {
     }
 
     private Sex parseSex(String sex) {
-        if (sex == null || sex.isBlank()) {
-            return null;
-        }
         try {
             return Sex.valueOf(sex);
         } catch (IllegalArgumentException e) {
             throw new IllegalArgumentException("sex must be M or F");
         }
-    }
-
-    private String blankToNull(String value) {
-        return value == null || value.isBlank() ? null : value;
     }
 }
