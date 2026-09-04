@@ -29,6 +29,25 @@ export interface CreateRunnerResponse {
   teamId: number
 }
 
+export interface RunnerResponse {
+  id: number
+  name: string
+  leg: number
+  bib: string | null
+  sex: 'M' | 'F' | null
+  epcHex: string
+  status: 'ACTIVE' | 'INACTIVE'
+  teamId: number
+}
+
+export interface TeamDetailResponse {
+  id: number
+  name: string
+  division: string | null
+  epcHex: string
+  runners: RunnerResponse[]
+}
+
 export interface ApiError {
   error: string
 }

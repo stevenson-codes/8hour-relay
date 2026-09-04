@@ -1,5 +1,6 @@
 package com.sbeve.relaytiming.services;
 
+import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
@@ -86,6 +87,109 @@ public class TeamService {
         runner.setBib(request.bib());
         runner.setSex(sex);
         return runnerRepository.save(runner);
+    }
+
+    public TeamEntity getTeam(Long teamId) {
+        return teamRepository.findById(teamId)
+                .orElseThrow(() -> new NoSuchElementException("Team " + teamId + " not found"));
+    }
+
+    public TeamEntity updateTeam(Long teamId, CreateTeamRequest request) {
+        TeamEntity team = getTeam(teamId);
+
+        if (request.name() == null || request.name().isBlank()) {
+            throw new IllegalArgumentException("Team name is required");
+        }
+        if (request.division() == null || request.division().isBlank()) {
+            throw new IllegalArgumentException("Division is required");
+        }
+
+        TagEntity currentTag = team.getTag();
+        if (!currentTag.getEpcHex().equals(request.epcHex())) {
+            TagEntity newTag = resolveTag(request.epcHex(), TagType.TEAM);
+            if (teamRepository.existsByTag(newTag)) {
+                throw new IllegalStateException("Tag " + newTag.getEpcHex() + " is already assigned to a team");
+            }
+            team.setTag(newTag);
+        }
+
+        team.setName(request.name());
+        team.setDivision(request.division());
+        return teamRepository.save(team);
+    }
+
+    public void deleteTeam(Long teamId) {
+        TeamEntity team = getTeam(teamId);
+        List<RunnerEntity> runners = runnerRepository.findByTeamOrderByLeg(team);
+        for (RunnerEntity runner : runners) {
+            deleteRunnerCascade(runner);
+        }
+
+        TagEntity teamTag = team.getTag();
+        teamRepository.delete(team);
+        lapRecordRepository.deleteByTag(teamTag);
+        tagRepository.delete(teamTag);
+        log.atInfo().log("Deleted team {}", teamId);
+    }
+
+    public RunnerEntity updateRunner(Long teamId, Long runnerId, CreateRunnerRequest request) {
+        TeamEntity team = getTeam(teamId);
+        RunnerEntity runner = getRunnerForTeam(team, runnerId);
+
+        if (request.name() == null || request.name().isBlank()) {
+            throw new IllegalArgumentException("Runner name is required");
+        }
+        if (request.leg() == null || request.leg() < 1) {
+            throw new IllegalArgumentException("leg must be a positive integer");
+        }
+        if (!request.leg().equals(runner.getLeg()) && runnerRepository.existsByTeamAndLeg(team, request.leg())) {
+            throw new IllegalStateException("Team already has a runner at leg " + request.leg());
+        }
+        if (request.bib() == null || request.bib().isBlank()) {
+            throw new IllegalArgumentException("bib is required");
+        }
+        if (request.sex() == null || request.sex().isBlank()) {
+            throw new IllegalArgumentException("sex is required");
+        }
+        Sex sex = parseSex(request.sex());
+
+        TagEntity currentTag = runner.getTag();
+        if (!currentTag.getEpcHex().equals(request.epcHex())) {
+            TagEntity newTag = resolveTag(request.epcHex(), TagType.RUNNER);
+            if (runnerRepository.existsByTag(newTag)) {
+                throw new IllegalStateException("Tag " + newTag.getEpcHex() + " is already assigned to a runner");
+            }
+            runner.setTag(newTag);
+        }
+
+        runner.setName(request.name());
+        runner.setLeg(request.leg());
+        runner.setBib(request.bib());
+        runner.setSex(sex);
+        return runnerRepository.save(runner);
+    }
+
+    public void deleteRunner(Long teamId, Long runnerId) {
+        TeamEntity team = getTeam(teamId);
+        RunnerEntity runner = getRunnerForTeam(team, runnerId);
+        deleteRunnerCascade(runner);
+        log.atInfo().log("Deleted runner {} from team {}", runnerId, teamId);
+    }
+
+    private RunnerEntity getRunnerForTeam(TeamEntity team, Long runnerId) {
+        RunnerEntity runner = runnerRepository.findById(runnerId)
+                .orElseThrow(() -> new NoSuchElementException("Runner " + runnerId + " not found"));
+        if (!runner.getTeam().getId().equals(team.getId())) {
+            throw new NoSuchElementException("Runner " + runnerId + " not found for team " + team.getId());
+        }
+        return runner;
+    }
+
+    private void deleteRunnerCascade(RunnerEntity runner) {
+        TagEntity tag = runner.getTag();
+        runnerRepository.delete(runner);
+        lapRecordRepository.deleteByTag(tag);
+        tagRepository.delete(tag);
     }
 
     public void wipeAll() {

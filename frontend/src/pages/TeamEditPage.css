@@ -1,0 +1,42 @@
+.edit-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.add-runner-heading {
+  margin: 24px 0 16px;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.mono-cell {
+  font-family: monospace;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.row-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.table-input {
+  width: 100%;
+  background: var(--card-bg-alt);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 6px 8px;
+  color: var(--ink);
+  font-size: 13px;
+  font-family: inherit;
+
+  &:focus {
+    outline: none;
+    border-color: var(--cyan);
+  }
+}
+
+.table-input-narrow {
+  width: 70px;
+}

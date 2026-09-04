@@ -205,6 +205,11 @@
   border-bottom: 1px solid var(--line);
 }
 
+.team-edit-link {
+  flex-shrink: 0;
+  margin-left: 8px;
+}
+
 .team-rank {
   display: flex;
   align-items: center;

@@ -331,6 +331,10 @@ function Dashboard() {
                   {formatGap(team.gapToLeaderKm)}
                 </span>
               </div>
+
+              <Link to={`/teams/${team.id}`} className="nav-link-button team-edit-link">
+                Edit
+              </Link>
             </div>
 
             <div className="team-card-current">
