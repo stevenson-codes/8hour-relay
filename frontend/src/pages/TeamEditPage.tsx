@@ -62,6 +62,7 @@ function TeamEditPage() {
   const [editRunnerForm, setEditRunnerForm] = useState<RunnerFormState>(emptyRunnerForm)
   const [runnerSaving, setRunnerSaving] = useState(false)
   const [runnerDeletingId, setRunnerDeletingId] = useState<number | null>(null)
+  const [runnerStatusUpdatingId, setRunnerStatusUpdatingId] = useState<number | null>(null)
   const [runnerRowError, setRunnerRowError] = useState<string | null>(null)
 
   const [addRunnerForm, setAddRunnerForm] = useState<RunnerFormState>(emptyRunnerForm)
@@ -154,6 +155,17 @@ function TeamEditPage() {
       })
       .catch((err: Error) => setRunnerRowError(err.message))
       .finally(() => setRunnerSaving(false))
+  }
+
+  function handleSetRunnerStatus(runnerId: number, status: 'ACTIVE' | 'INACTIVE') {
+    if (!teamId || runnerStatusUpdatingId !== null) return
+
+    setRunnerStatusUpdatingId(runnerId)
+    setRunnerRowError(null)
+    apiRequest(`/api/teams/${teamId}/runners/${runnerId}/status`, 'PATCH', { status })
+      .then(() => loadTeam())
+      .catch((err: Error) => setRunnerRowError(err.message))
+      .finally(() => setRunnerStatusUpdatingId(null))
   }
 
   function handleDeleteRunner(runnerId: number) {
@@ -334,7 +346,18 @@ function TeamEditPage() {
                                 onChange={(e) => setEditRunnerForm((f) => ({ ...f, epcHex: e.target.value }))}
                               />
                             </td>
-                            <td>{runner.status}</td>
+                            <td>
+                              <button
+                                type="button"
+                                className={runner.status === 'ACTIVE' ? 'status-toggle status-toggle-active' : 'status-toggle status-toggle-inactive'}
+                                onClick={() =>
+                                  handleSetRunnerStatus(runner.id, runner.status === 'ACTIVE' ? 'INACTIVE' : 'ACTIVE')
+                                }
+                                disabled={runnerStatusUpdatingId !== null}
+                              >
+                                {runnerStatusUpdatingId === runner.id ? 'Updating…' : runner.status}
+                              </button>
+                            </td>
                             <td className="row-actions">
                               <button
                                 type="button"
@@ -356,7 +379,20 @@ function TeamEditPage() {
                             <td>{runner.bib ?? '—'}</td>
                             <td>{runner.sex ?? '—'}</td>
                             <td className="mono-cell">{runner.epcHex}</td>
-                            <td>{runner.status}</td>
+                            <td>
+                              <button
+                                type="button"
+                                className={runner.status === 'ACTIVE' ? 'status-toggle status-toggle-active' : 'status-toggle status-toggle-inactive'}
+                                onClick={() =>
+                                  handleSetRunnerStatus(runner.id, runner.status === 'ACTIVE' ? 'INACTIVE' : 'ACTIVE')
+                                }
+                                disabled={
+                                  editingRunnerId !== null || runnerDeletingId !== null || runnerStatusUpdatingId !== null
+                                }
+                              >
+                                {runnerStatusUpdatingId === runner.id ? 'Updating…' : runner.status}
+                              </button>
+                            </td>
                             <td className="row-actions">
                               <button
                                 type="button"

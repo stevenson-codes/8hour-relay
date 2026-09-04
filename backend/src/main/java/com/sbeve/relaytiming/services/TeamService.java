@@ -173,6 +173,25 @@ public class TeamService {
         return runnerRepository.save(runner);
     }
 
+    public RunnerEntity setRunnerStatus(Long teamId, Long runnerId, String status) {
+        TeamEntity team = getTeam(teamId);
+        RunnerEntity runner = getRunnerForTeam(team, runnerId);
+        RunnerStatus newStatus = parseRunnerStatus(status);
+
+        if (newStatus == RunnerStatus.ACTIVE) {
+            List<RunnerEntity> teammates = runnerRepository.findByTeamOrderByLeg(team);
+            for (RunnerEntity teammate : teammates) {
+                if (!teammate.getId().equals(runner.getId()) && teammate.getStatus() == RunnerStatus.ACTIVE) {
+                    teammate.setStatus(RunnerStatus.INACTIVE);
+                    runnerRepository.save(teammate);
+                }
+            }
+        }
+
+        runner.setStatus(newStatus);
+        return runnerRepository.save(runner);
+    }
+
     public void deleteRunner(Long teamId, Long runnerId) {
         TeamEntity team = getTeam(teamId);
         RunnerEntity runner = getRunnerForTeam(team, runnerId);
@@ -226,6 +245,14 @@ public class TeamService {
             return Sex.valueOf(sex);
         } catch (IllegalArgumentException e) {
             throw new IllegalArgumentException("sex must be M or F");
+        }
+    }
+
+    private RunnerStatus parseRunnerStatus(String status) {
+        try {
+            return RunnerStatus.valueOf(status);
+        } catch (IllegalArgumentException | NullPointerException e) {
+            throw new IllegalArgumentException("status must be one of " + Arrays.toString(RunnerStatus.values()));
         }
     }
 

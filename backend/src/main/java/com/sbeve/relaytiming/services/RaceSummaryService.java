@@ -158,7 +158,7 @@ public class RaceSummaryService {
 
         Double gapToLeaderKm = overallRank == 1 ? null : totalDistanceKm - leaderDistanceKm;
 
-        return new TeamSummaryDto(team.getId(), team.getName(),
+        return new TeamSummaryDto(team.getId(), team.getName(), team.getTag().getEpcHex(),
                 team.getDivision() == null ? null : team.getDivision().name(), overallRank, divisionRank,
                 totalLaps, totalDistanceKm, gapToLeaderKm, currentRunnerRef, startTimeThisLeg, nextRunnerRef,
                 teamLastLapMillis, avgPaceSecPerKm, runnerDtos);

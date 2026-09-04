@@ -6,6 +6,7 @@ import java.util.List;
 public record TeamSummaryDto(
         Long id,
         String name,
+        String epcHex,
         String division,
         int overallRank,
         int divisionRank,

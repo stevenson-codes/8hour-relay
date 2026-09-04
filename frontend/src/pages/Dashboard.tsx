@@ -241,6 +241,9 @@ function Dashboard() {
             <Link to="/add-team" className="nav-link-button">
               Add Team
             </Link>
+            <Link to="/board" className="nav-link-button">
+              Board View
+            </Link>
             <button
               type="button"
               className={raceActive ? "stop-button" : "start-button"}
@@ -304,6 +307,7 @@ function Dashboard() {
               <span className="team-rank">{team.overallRank}</span>
               <div className="team-heading">
                 <h2>{team.name}</h2>
+                <span className="team-epc">{team.epcHex}</span>
                 <span className="team-division">{team.division ?? "—"}</span>
               </div>
 

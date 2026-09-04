@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -22,6 +23,7 @@ import com.sbeve.relaytiming.requests.CreateTeamRequest;
 import com.sbeve.relaytiming.requests.CreateTeamResponse;
 import com.sbeve.relaytiming.requests.RunnerResponse;
 import com.sbeve.relaytiming.requests.TeamResponse;
+import com.sbeve.relaytiming.requests.UpdateRunnerStatusRequest;
 import com.sbeve.relaytiming.services.RaceStateService;
 import com.sbeve.relaytiming.services.TeamService;
 
@@ -82,6 +84,13 @@ public class TeamController {
     public CreateRunnerResponse updateRunner(@PathVariable Long teamId, @PathVariable Long runnerId,
             @RequestBody CreateRunnerRequest request) {
         RunnerEntity runner = teamService.updateRunner(teamId, runnerId, request);
+        return toCreateRunnerResponse(runner);
+    }
+
+    @PatchMapping("/{teamId}/runners/{runnerId}/status")
+    public CreateRunnerResponse updateRunnerStatus(@PathVariable Long teamId, @PathVariable Long runnerId,
+            @RequestBody UpdateRunnerStatusRequest request) {
+        RunnerEntity runner = teamService.setRunnerStatus(teamId, runnerId, request.status());
         return toCreateRunnerResponse(runner);
     }
 

@@ -29,6 +29,7 @@ export interface RunnerBoardRow {
 export interface TeamBoard {
   id: number
   name: string
+  epcHex: string
   division: Division | null
   overallRank: number
   divisionRank: number

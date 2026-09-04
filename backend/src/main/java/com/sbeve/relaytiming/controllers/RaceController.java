@@ -19,18 +19,18 @@ public class RaceController {
 
     @GetMapping("/status")
     public RaceStatusDto getStatus() {
-        return new RaceStatusDto(raceStateService.isActive());
+        return new RaceStatusDto(raceStateService.isActive(), raceStateService.getStartedAt());
     }
 
     @PostMapping("/start")
     public RaceStatusDto start() {
         raceStateService.start();
-        return new RaceStatusDto(raceStateService.isActive());
+        return new RaceStatusDto(raceStateService.isActive(), raceStateService.getStartedAt());
     }
 
     @PostMapping("/stop")
     public RaceStatusDto stop() {
         raceStateService.stop();
-        return new RaceStatusDto(raceStateService.isActive());
+        return new RaceStatusDto(raceStateService.isActive(), raceStateService.getStartedAt());
     }
 }

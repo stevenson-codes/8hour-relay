@@ -1,4 +1,6 @@
 package com.sbeve.relaytiming.dto;
 
-public record RaceStatusDto(boolean active) {
+import java.time.Instant;
+
+public record RaceStatusDto(boolean active, Instant startedAt) {
 }

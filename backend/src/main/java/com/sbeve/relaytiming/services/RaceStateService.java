@@ -21,6 +21,12 @@ public class RaceStateService {
         return active.get();
     }
 
+    public Instant getStartedAt() {
+        return raceStateRepository.findTopByOrderByStartedAtDesc()
+                .map(RaceStateEntity::getStartedAt)
+                .orElse(null);
+    }
+
     public void start() {
         active.set(true);
         raceStateRepository.save(new RaceStateEntity(Instant.now()));

@@ -45,3 +45,35 @@ select.table-input {
   padding: 8px 10px;
   font-size: 14px;
 }
+
+.status-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 84px;
+  padding: 5px 12px;
+  border-radius: 5px;
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  line-height: 1.4;
+  cursor: pointer;
+  border: 1px solid var(--line);
+  background: transparent;
+
+  &:disabled {
+    cursor: default;
+    opacity: 0.6;
+  }
+}
+
+.status-toggle-active {
+  color: var(--green);
+  border-color: var(--green);
+}
+
+.status-toggle-inactive {
+  color: var(--muted);
+}
