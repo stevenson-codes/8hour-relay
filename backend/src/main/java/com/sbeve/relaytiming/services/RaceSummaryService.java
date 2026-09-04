@@ -17,6 +17,7 @@ import com.sbeve.relaytiming.dto.TeamSummaryDto;
 import com.sbeve.relaytiming.entities.LapRecordEntity;
 import com.sbeve.relaytiming.entities.RunnerEntity;
 import com.sbeve.relaytiming.entities.TeamEntity;
+import com.sbeve.relaytiming.entities.enums.Division;
 import com.sbeve.relaytiming.entities.enums.LapStatus;
 import com.sbeve.relaytiming.entities.enums.RunnerStatus;
 import com.sbeve.relaytiming.repositories.LapRecordRepository;
@@ -60,7 +61,7 @@ public class RaceSummaryService {
         }
 
         Map<TeamEntity, Integer> divisionRanks = new HashMap<>();
-        Map<String, List<TeamAgg>> byDivision = new HashMap<>();
+        Map<Division, List<TeamAgg>> byDivision = new HashMap<>();
         for (TeamAgg agg : byTotalLapsDesc) {
             byDivision.computeIfAbsent(agg.team().getDivision(), key -> new ArrayList<>()).add(agg);
         }
@@ -157,7 +158,8 @@ public class RaceSummaryService {
 
         Double gapToLeaderKm = overallRank == 1 ? null : totalDistanceKm - leaderDistanceKm;
 
-        return new TeamSummaryDto(team.getId(), team.getName(), team.getDivision(), overallRank, divisionRank,
+        return new TeamSummaryDto(team.getId(), team.getName(),
+                team.getDivision() == null ? null : team.getDivision().name(), overallRank, divisionRank,
                 totalLaps, totalDistanceKm, gapToLeaderKm, currentRunnerRef, startTimeThisLeg, nextRunnerRef,
                 teamLastLapMillis, avgPaceSecPerKm, runnerDtos);
     }

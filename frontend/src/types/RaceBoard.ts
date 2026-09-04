@@ -1,4 +1,5 @@
 export type Sex = 'M' | 'F'
+export type Division = 'OPEN' | 'MASTERS' | 'MIXED'
 
 export interface RunnerRef {
   leg: number
@@ -28,7 +29,7 @@ export interface RunnerBoardRow {
 export interface TeamBoard {
   id: number
   name: string
-  division: string | null
+  division: Division | null
   overallRank: number
   divisionRank: number
   totalLaps: number

@@ -51,8 +51,8 @@ public class TeamController {
         List<RunnerResponse> runners = runnerRepository.findByTeamOrderByLeg(team).stream()
                 .map(this::toRunnerResponse)
                 .toList();
-        return new TeamResponse(team.getId(), team.getName(), team.getDivision(), team.getTag().getEpcHex(),
-                runners);
+        return new TeamResponse(team.getId(), team.getName(),
+                team.getDivision() == null ? null : team.getDivision().name(), team.getTag().getEpcHex(), runners);
     }
 
     @PutMapping("/{teamId}")
@@ -106,7 +106,8 @@ public class TeamController {
     }
 
     private CreateTeamResponse toTeamResponse(TeamEntity team) {
-        return new CreateTeamResponse(team.getId(), team.getName(), team.getDivision(), team.getTag().getEpcHex());
+        return new CreateTeamResponse(team.getId(), team.getName(),
+                team.getDivision() == null ? null : team.getDivision().name(), team.getTag().getEpcHex());
     }
 
     private CreateRunnerResponse toCreateRunnerResponse(RunnerEntity runner) {

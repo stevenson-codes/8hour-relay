@@ -1,6 +1,7 @@
 import { useState, type FormEvent } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import type { ApiError, CreateTeamResponse } from '../types/TeamAdmin'
+import { DIVISION_OPTIONS, type ApiError, type CreateTeamResponse, type Division } from '../types/TeamAdmin'
+import Dropdown from '../components/Dropdown'
 import '../App.css'
 import './AddTeamPage.css'
 
@@ -21,7 +22,7 @@ function AddTeamPage() {
   const navigate = useNavigate()
 
   const [teamName, setTeamName] = useState('')
-  const [teamDivision, setTeamDivision] = useState('')
+  const [teamDivision, setTeamDivision] = useState<Division | ''>('')
   const [teamEpcHex, setTeamEpcHex] = useState('')
   const [teamError, setTeamError] = useState<string | null>(null)
   const [teamPending, setTeamPending] = useState(false)
@@ -93,13 +94,7 @@ function AddTeamPage() {
             </label>
             <label className="form-field">
               <span>Division</span>
-              <input
-                type="text"
-                value={teamDivision}
-                onChange={(e) => setTeamDivision(e.target.value)}
-                required
-                placeholder="Open"
-              />
+              <Dropdown value={teamDivision} onChange={setTeamDivision} options={DIVISION_OPTIONS} />
             </label>
             <label className="form-field">
               <span>Team Tag EPC Hex</span>

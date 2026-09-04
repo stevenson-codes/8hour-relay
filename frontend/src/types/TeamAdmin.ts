@@ -1,13 +1,26 @@
+export type Division = 'OPEN' | 'MASTERS' | 'MIXED'
+
+export const DIVISION_OPTIONS: { value: Division; label: string }[] = [
+  { value: 'OPEN', label: 'Open' },
+  { value: 'MASTERS', label: 'Masters' },
+  { value: 'MIXED', label: 'Mixed' },
+]
+
+export const SEX_OPTIONS: { value: 'M' | 'F'; label: string }[] = [
+  { value: 'M', label: 'M' },
+  { value: 'F', label: 'F' },
+]
+
 export interface CreateTeamRequest {
   name: string
-  division: string | null
+  division: Division | null
   epcHex: string
 }
 
 export interface CreateTeamResponse {
   id: number
   name: string
-  division: string | null
+  division: Division | null
   epcHex: string
 }
 
@@ -43,7 +56,7 @@ export interface RunnerResponse {
 export interface TeamDetailResponse {
   id: number
   name: string
-  division: string | null
+  division: Division | null
   epcHex: string
   runners: RunnerResponse[]
 }

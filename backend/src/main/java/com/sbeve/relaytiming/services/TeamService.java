@@ -1,5 +1,6 @@
 package com.sbeve.relaytiming.services;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
@@ -11,6 +12,7 @@ import org.springframework.stereotype.Service;
 import com.sbeve.relaytiming.entities.RunnerEntity;
 import com.sbeve.relaytiming.entities.TagEntity;
 import com.sbeve.relaytiming.entities.TeamEntity;
+import com.sbeve.relaytiming.entities.enums.Division;
 import com.sbeve.relaytiming.entities.enums.RunnerStatus;
 import com.sbeve.relaytiming.entities.enums.Sex;
 import com.sbeve.relaytiming.entities.enums.TagType;
@@ -45,6 +47,7 @@ public class TeamService {
         if (request.division() == null || request.division().isBlank()) {
             throw new IllegalArgumentException("Division is required");
         }
+        Division division = parseDivision(request.division());
 
         TagEntity tag = resolveTag(request.epcHex(), TagType.TEAM);
         if (teamRepository.existsByTag(tag)) {
@@ -52,7 +55,7 @@ public class TeamService {
         }
 
         TeamEntity team = new TeamEntity(request.name(), tag);
-        team.setDivision(request.division());
+        team.setDivision(division);
         return teamRepository.save(team);
     }
 
@@ -103,6 +106,7 @@ public class TeamService {
         if (request.division() == null || request.division().isBlank()) {
             throw new IllegalArgumentException("Division is required");
         }
+        Division division = parseDivision(request.division());
 
         TagEntity currentTag = team.getTag();
         if (!currentTag.getEpcHex().equals(request.epcHex())) {
@@ -114,7 +118,7 @@ public class TeamService {
         }
 
         team.setName(request.name());
-        team.setDivision(request.division());
+        team.setDivision(division);
         return teamRepository.save(team);
     }
 
@@ -222,6 +226,14 @@ public class TeamService {
             return Sex.valueOf(sex);
         } catch (IllegalArgumentException e) {
             throw new IllegalArgumentException("sex must be M or F");
+        }
+    }
+
+    private Division parseDivision(String division) {
+        try {
+            return Division.valueOf(division);
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException("division must be one of " + Arrays.toString(Division.values()));
         }
     }
 }

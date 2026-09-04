@@ -1,6 +1,15 @@
 import { useCallback, useEffect, useState, type FormEvent } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
-import type { ApiError, CreateRunnerResponse, RunnerResponse, TeamDetailResponse } from '../types/TeamAdmin'
+import {
+  DIVISION_OPTIONS,
+  SEX_OPTIONS,
+  type ApiError,
+  type CreateRunnerResponse,
+  type Division,
+  type RunnerResponse,
+  type TeamDetailResponse,
+} from '../types/TeamAdmin'
+import Dropdown from '../components/Dropdown'
 import '../App.css'
 import './AddTeamPage.css'
 import './TeamEditPage.css'
@@ -25,7 +34,7 @@ interface RunnerFormState {
   name: string
   leg: string
   bib: string
-  sex: string
+  sex: 'M' | 'F' | ''
   epcHex: string
 }
 
@@ -43,7 +52,7 @@ function TeamEditPage() {
   const [loadError, setLoadError] = useState<string | null>(null)
 
   const [teamName, setTeamName] = useState('')
-  const [teamDivision, setTeamDivision] = useState('')
+  const [teamDivision, setTeamDivision] = useState<Division | ''>('')
   const [teamEpcHex, setTeamEpcHex] = useState('')
   const [teamSaving, setTeamSaving] = useState(false)
   const [teamDeleting, setTeamDeleting] = useState(false)
@@ -239,12 +248,7 @@ function TeamEditPage() {
                 </label>
                 <label className="form-field">
                   <span>Division</span>
-                  <input
-                    type="text"
-                    value={teamDivision}
-                    onChange={(e) => setTeamDivision(e.target.value)}
-                    required
-                  />
+                  <Dropdown value={teamDivision} onChange={setTeamDivision} options={DIVISION_OPTIONS} />
                 </label>
                 <label className="form-field">
                   <span>Team Tag EPC Hex</span>
@@ -315,17 +319,12 @@ function TeamEditPage() {
                               />
                             </td>
                             <td>
-                              <select
-                                className="table-input table-input-narrow"
+                              <Dropdown
+                                className="table-input-narrow"
                                 value={editRunnerForm.sex}
-                                onChange={(e) => setEditRunnerForm((f) => ({ ...f, sex: e.target.value }))}
-                              >
-                                <option value="" disabled>
-                                  Select…
-                                </option>
-                                <option value="M">M</option>
-                                <option value="F">F</option>
-                              </select>
+                                onChange={(sex) => setEditRunnerForm((f) => ({ ...f, sex }))}
+                                options={SEX_OPTIONS}
+                              />
                             </td>
                             <td>
                               <input
@@ -419,17 +418,11 @@ function TeamEditPage() {
                 </label>
                 <label className="form-field form-field-narrow">
                   <span>Sex</span>
-                  <select
+                  <Dropdown
                     value={addRunnerForm.sex}
-                    onChange={(e) => setAddRunnerForm((f) => ({ ...f, sex: e.target.value }))}
-                    required
-                  >
-                    <option value="" disabled>
-                      Select…
-                    </option>
-                    <option value="M">M</option>
-                    <option value="F">F</option>
-                  </select>
+                    onChange={(sex) => setAddRunnerForm((f) => ({ ...f, sex }))}
+                    options={SEX_OPTIONS}
+                  />
                 </label>
                 <label className="form-field">
                   <span>Runner Tag EPC Hex</span>

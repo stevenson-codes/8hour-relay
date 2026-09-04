@@ -1,7 +1,11 @@
 package com.sbeve.relaytiming.entities;
 
+import com.sbeve.relaytiming.entities.enums.Division;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -19,8 +23,9 @@ public class TeamEntity {
     @Column(nullable = false)
     private String name;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "division", nullable = false)
-    private String division;
+    private Division division;
 
     @OneToOne
     @JoinColumn(name = "epc_hex", nullable = false)
@@ -46,11 +51,11 @@ public class TeamEntity {
         this.name = name;
     }
 
-    public String getDivision() {
+    public Division getDivision() {
         return division;
     }
 
-    public void setDivision(String division) {
+    public void setDivision(Division division) {
         this.division = division;
     }
 
