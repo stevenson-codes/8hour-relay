@@ -173,13 +173,13 @@ public class RaceSummaryService {
         String statusLabel;
         if (isCurrent) {
             status = "RUNNING";
-            statusLabel = "Running Now (Leg " + agg.turnCount() + ")";
+            statusLabel = "Running Now";
         } else if (isNext) {
             status = "NEXT";
             statusLabel = "Next to Run";
         } else if (agg.turnCount() > 0) {
             status = "COMPLETED";
-            statusLabel = "Completed (Leg " + agg.turnCount() + ")";
+            statusLabel = "Completed Leg " + agg.turnCount();
         } else {
             status = "WAITING";
             statusLabel = "Waiting";
