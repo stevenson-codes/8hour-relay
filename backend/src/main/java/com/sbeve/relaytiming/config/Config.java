@@ -1,7 +1,7 @@
 package com.sbeve.relaytiming.config;
 
 public class Config {
-    public static final String BROKER_URL = "tcp://127.0.0.1:1883";
+    public static final String BROKER_URL = System.getenv().getOrDefault("MQTT_BROKER_URL", "tcp://127.0.0.1:1883");
     public static final String CLIENT_ID = "TagReadListener";
     public static final String TAG_READS_TOPIC = "relay/read";
 
