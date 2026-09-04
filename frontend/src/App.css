@@ -19,11 +19,17 @@
 
 .board-header {
   display: flex;
-  align-items: flex-start;
-  gap: 24px;
+  flex-direction: column;
+  gap: 12px;
   padding: 18px 28px;
   border-bottom: 1px solid var(--line);
   background: linear-gradient(180deg, #0b0c11 0%, #08090c 100%);
+}
+
+.board-header-top {
+  display: flex;
+  align-items: flex-start;
+  gap: 24px;
 }
 
 .brand {
@@ -125,9 +131,10 @@
 
 .board-controls {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
+  justify-content: flex-end;
   gap: 8px;
-  margin-top: 8px;
 }
 
 .controls-error {
@@ -164,6 +171,11 @@
     border-color: var(--ink);
     color: var(--ink);
   }
+}
+
+.nav-toggle {
+  justify-content: center;
+  width: 96px;
 }
 
 .start-button {

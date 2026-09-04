@@ -1,55 +1,15 @@
-.rboard {
+.leaderboard {
   display: flex;
   flex-direction: column;
 }
 
-.rboard-header {
-  display: flex;
-  align-items: flex-start;
-  gap: 24px;
-  padding: 18px 28px;
-  border-bottom: 1px solid var(--line);
-  background: linear-gradient(180deg, #0b0c11 0%, #08090c 100%);
-}
-
-.rboard-title {
-  flex: 1;
-  min-width: 0;
-  margin: 2px 0 4px;
-  font-size: 22px;
-  font-weight: 700;
-  letter-spacing: 0;
-  text-transform: uppercase;
-  text-align: left;
-  color: var(--ink);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.rboard-header-right {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 4px;
-  flex-shrink: 0;
-}
-
-.rboard-header-clock {
-  font-family: var(--mono);
-  font-size: 18px;
-  font-weight: 600;
-  color: var(--ink);
-  font-variant-numeric: tabular-nums;
-}
-
-.rboard-stats {
+.leaderboard-stats {
   display: flex;
   border-bottom: 1px solid var(--line);
   background: var(--card-bg);
 }
 
-.rboard-stat {
+.leaderboard-stat {
   flex: 1;
   display: flex;
   align-items: center;
@@ -61,7 +21,7 @@
   }
 }
 
-.rboard-stat-icon {
+.leaderboard-stat-icon {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -69,25 +29,25 @@
   color: var(--cyan);
 }
 
-.rboard-stat-icon.amber {
+.leaderboard-stat-icon.amber {
   color: var(--amber);
 }
 
-.rboard-stat-icon.green {
+.leaderboard-stat-icon.green {
   color: var(--green);
 }
 
-.rboard-stat-icon.red {
+.leaderboard-stat-icon.red {
   color: var(--red);
 }
 
-.rboard-stat-body {
+.leaderboard-stat-body {
   display: flex;
   flex-direction: column;
   gap: 4px;
 }
 
-.rboard-stat-label {
+.leaderboard-stat-label {
   font-size: 11px;
   font-weight: 700;
   letter-spacing: 0.08em;
@@ -95,26 +55,26 @@
   color: var(--muted);
 }
 
-.rboard-stat-value {
+.leaderboard-stat-value {
   font-size: 26px;
   font-weight: 700;
   color: var(--ink);
   font-variant-numeric: tabular-nums;
 }
 
-.rboard-stat-value.amber {
+.leaderboard-stat-value.amber {
   color: var(--amber);
 }
 
-.rboard-stat-value.green {
+.leaderboard-stat-value.green {
   color: var(--green);
 }
 
-.rboard-stat-value.red {
+.leaderboard-stat-value.red {
   color: var(--red);
 }
 
-.rboard-table-header {
+.leaderboard-table-header {
   display: flex;
   align-items: center;
   gap: 16px;
@@ -131,13 +91,13 @@
   }
 }
 
-.rboard-showing {
+.leaderboard-showing {
   flex: 1;
   font-size: 12px;
   color: var(--muted);
 }
 
-.rboard-refresh {
+.leaderboard-refresh {
   display: inline-flex;
   align-items: center;
   gap: 6px;
@@ -145,12 +105,12 @@
   color: var(--muted);
 }
 
-.rboard-table-wrap {
+.leaderboard-table-wrap {
   overflow-x: auto;
   flex: 1;
 }
 
-.rboard-table {
+.leaderboard-table {
   width: 100%;
   min-width: 980px;
   border-collapse: collapse;
@@ -186,21 +146,21 @@
   }
 }
 
-.rboard-rank {
+.leaderboard-rank {
   font-size: 16px;
   font-weight: 800;
   color: var(--ink);
 }
 
-.rboard-rank.rank-leader {
+.leaderboard-rank.rank-leader {
   color: var(--amber);
 }
 
-.rboard-team-name {
+.leaderboard-team-name {
   font-weight: 700;
 }
 
-.rboard-distance {
+.leaderboard-distance {
   color: var(--amber);
   font-weight: 700;
 }
@@ -220,7 +180,7 @@
   font-weight: 700;
 }
 
-.rboard-status-row {
+.leaderboard-status-row {
   color: var(--muted);
   padding: 20px 16px;
 }
@@ -249,7 +209,7 @@
   color: var(--muted);
 }
 
-.rboard-footer {
+.leaderboard-footer {
   display: flex;
   align-items: center;
   gap: 24px;
@@ -259,14 +219,14 @@
   flex-wrap: wrap;
 }
 
-.rboard-mode {
+.leaderboard-mode {
   display: flex;
   align-items: center;
   gap: 10px;
   flex-wrap: wrap;
 }
 
-.rboard-mode-label {
+.leaderboard-mode-label {
   font-size: 10px;
   font-weight: 700;
   letter-spacing: 0.06em;
@@ -275,7 +235,7 @@
   margin-right: 4px;
 }
 
-.rboard-mode-tab {
+.leaderboard-mode-tab {
   display: inline-flex;
   align-items: center;
   padding: 6px 14px;
@@ -295,7 +255,7 @@
   }
 }
 
-.rboard-mode-tab.active {
+.leaderboard-mode-tab.active {
   border-color: color-mix(in srgb, var(--amber) 50%, var(--line));
   background: color-mix(in srgb, var(--amber) 12%, transparent);
   color: var(--amber);

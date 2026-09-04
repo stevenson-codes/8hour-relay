@@ -2,7 +2,7 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import Dashboard from './pages/Dashboard'
 import AddTeamPage from './pages/AddTeamPage'
 import TeamEditPage from './pages/TeamEditPage'
-import RunnersBoardPage from './pages/RunnersBoardPage'
+import LeaderboardPage from './pages/LeaderboardPage'
 import './App.css'
 
 function App() {
@@ -12,7 +12,7 @@ function App() {
         <Route path="/" element={<Dashboard />} />
         <Route path="/add-team" element={<AddTeamPage />} />
         <Route path="/teams/:teamId" element={<TeamEditPage />} />
-        <Route path="/board" element={<RunnersBoardPage />} />
+        <Route path="/leaderboard" element={<LeaderboardPage />} />
       </Routes>
     </BrowserRouter>
   )

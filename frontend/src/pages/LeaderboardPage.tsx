@@ -1,12 +1,11 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { Link } from "react-router-dom";
+import BoardHeader from "../components/BoardHeader";
 import type { Division, RunnerRef, TeamBoard } from "../types/RaceBoard";
 import type { RaceStatus } from "../types/RaceStatus";
 import "../App.css";
-import "./RunnersBoardPage.css";
+import "./LeaderboardPage.css";
 
 const SUMMARY_REFRESH_MS = 2_000;
-const RACE_STATUS_REFRESH_MS = 5_000;
 const RACE_DURATION_MS = 8 * 60 * 60 * 1000;
 const MAX_ROWS = 20;
 
@@ -167,7 +166,7 @@ function CurrentRunnerCell({ runner }: { runner: RunnerRef | null }) {
   );
 }
 
-function RunnersBoardPage() {
+function LeaderboardPage() {
   const [now, setNow] = useState(() => new Date());
   const [teams, setTeams] = useState<TeamBoard[] | null>(null);
   const [boardError, setBoardError] = useState<string | null>(null);
@@ -199,22 +198,6 @@ function RunnersBoardPage() {
     return () => clearInterval(intervalId);
   }, [loadBoard]);
 
-  const loadRaceStatus = useCallback(() => {
-    return fetch("/api/race/status")
-      .then((res) => {
-        if (!res.ok) throw new Error(`Request failed: ${res.status}`);
-        return res.json() as Promise<RaceStatus>;
-      })
-      .then((status) => setRaceStatus(status))
-      .catch(() => undefined);
-  }, []);
-
-  useEffect(() => {
-    loadRaceStatus();
-    const intervalId = setInterval(loadRaceStatus, RACE_STATUS_REFRESH_MS);
-    return () => clearInterval(intervalId);
-  }, [loadRaceStatus]);
-
   const raceActive = raceStatus?.active ?? false;
   const elapsedMs =
     raceActive && raceStatus?.startedAt
@@ -237,96 +220,58 @@ function RunnersBoardPage() {
   const shownTeams = visibleTeams.slice(0, MAX_ROWS);
 
   return (
-    <div className="board rboard">
-      <header className="rboard-header">
-        <div className="brand">
-          <svg
-            className="brand-mark"
-            width="34"
-            height="34"
-            viewBox="0 0 24 24"
-            fill="none"
-            aria-hidden="true"
-          >
-            <path
-              d="M2 18 8 8l3.2 5L14 9l8 9z"
-              stroke="currentColor"
-              strokeWidth="1.6"
-              strokeLinejoin="round"
-            />
-          </svg>
-          <span className="brand-name">
-            VANCOUVER
-            <br />
-            RUNAHOLICS
-          </span>
-        </div>
+    <div className="board leaderboard">
+      <BoardHeader
+        title="BMAI Vancouver Runaholics 8-Hour Relay 2026"
+        now={now}
+        currentPage="leaderboard"
+        onBoardRefresh={loadBoard}
+        onRaceStatusChange={setRaceStatus}
+      />
 
-        <h1 className="rboard-title">
-          BMAI Vancouver Runaholics 8-Hour Relay 2026
-        </h1>
-
-        <div className="rboard-header-right">
-          <span className="rboard-header-clock">
-            {now.toLocaleTimeString([], {
-              hour: "numeric",
-              minute: "2-digit",
-              second: "2-digit",
-            })}
-          </span>
-          <span className="live-indicator">
-            <span className="live-dot" />
-            Live
-          </span>
-          <Link to="/" className="nav-link-button">
-            Team Board
-          </Link>
-        </div>
-      </header>
-
-      <div className="rboard-stats">
-        <div className="rboard-stat">
-          <span className="rboard-stat-icon cyan">
+      <div className="leaderboard-stats">
+        <div className="leaderboard-stat">
+          <span className="leaderboard-stat-icon cyan">
             <ClockIcon />
           </span>
-          <span className="rboard-stat-body">
-            <span className="rboard-stat-label">Race Time</span>
-            <span className="rboard-stat-value">
+          <span className="leaderboard-stat-body">
+            <span className="leaderboard-stat-label">Race Time</span>
+            <span className="leaderboard-stat-value">
               {formatDuration(elapsedMs)}
             </span>
           </span>
         </div>
-        <div className="rboard-stat">
-          <span className="rboard-stat-icon amber">
+        <div className="leaderboard-stat">
+          <span className="leaderboard-stat-icon amber">
             <HourglassIcon />
           </span>
-          <span className="rboard-stat-body">
-            <span className="rboard-stat-label">Time Remaining</span>
-            <span className="rboard-stat-value amber">
+          <span className="leaderboard-stat-body">
+            <span className="leaderboard-stat-label">Time Remaining</span>
+            <span className="leaderboard-stat-value amber">
               {formatDuration(remainingMs)}
             </span>
           </span>
         </div>
-        <div className="rboard-stat">
-          <span className={`rboard-stat-icon ${raceActive ? "green" : "red"}`}>
+        <div className="leaderboard-stat">
+          <span className={`leaderboard-stat-icon ${raceActive ? "green" : "red"}`}>
             <FlagIcon />
           </span>
-          <span className="rboard-stat-body">
-            <span className="rboard-stat-label">Race Status</span>
+          <span className="leaderboard-stat-body">
+            <span className="leaderboard-stat-label">Race Status</span>
             <span
-              className={`rboard-stat-value ${raceActive ? "green" : "red"}`}
+              className={`leaderboard-stat-value ${raceActive ? "green" : "red"}`}
             >
               {raceActive ? "Racing" : "Stopped"}
             </span>
           </span>
         </div>
-        <div className="rboard-stat">
-          <span className="rboard-stat-icon cyan">
+        <div className="leaderboard-stat">
+          <span className="leaderboard-stat-icon cyan">
             <ClockIcon />
           </span>
-          <span className="rboard-stat-body">
-            <span className="rboard-stat-label">Local Time</span>
-            <span className="rboard-stat-value">
+          <span className="leaderboard-stat-body">
+            <span className="leaderboard-stat-label">Local Time</span>
+            <span className="leaderboard-stat-value">
               {now.toLocaleTimeString([], {
                 hour: "numeric",
                 minute: "2-digit",
@@ -336,7 +281,7 @@ function RunnersBoardPage() {
         </div>
       </div>
 
-      <div className="rboard-table-header">
+      <div className="leaderboard-table-header">
         <h2>
           {mode === "OVERALL"
             ? "Overall"
@@ -346,18 +291,18 @@ function RunnersBoardPage() {
         {boardError ? (
           <span className="controls-error">{boardError}</span>
         ) : (
-          <span className="rboard-showing">
+          <span className="leaderboard-showing">
             Showing 1 – {shownTeams.length} of {visibleTeams.length} Teams
           </span>
         )}
-        <span className="rboard-refresh">
+        <span className="leaderboard-refresh">
           <RefreshIcon />
           Auto refresh: {SUMMARY_REFRESH_MS / 1000} sec
         </span>
       </div>
 
-      <div className="rboard-table-wrap">
-        <table className="rboard-table">
+      <div className="leaderboard-table-wrap">
+        <table className="leaderboard-table">
           <thead>
             <tr>
               <th>Rank</th>
@@ -376,14 +321,14 @@ function RunnersBoardPage() {
           <tbody>
             {teams === null && !boardError && (
               <tr>
-                <td colSpan={11} className="rboard-status-row">
+                <td colSpan={11} className="leaderboard-status-row">
                   Loading teams…
                 </td>
               </tr>
             )}
             {teams !== null && shownTeams.length === 0 && (
               <tr>
-                <td colSpan={11} className="rboard-status-row">
+                <td colSpan={11} className="leaderboard-status-row">
                   No teams found.
                 </td>
               </tr>
@@ -393,13 +338,13 @@ function RunnersBoardPage() {
                 <td
                   className={
                     team.overallRank === 1
-                      ? "rboard-rank rank-leader"
-                      : "rboard-rank"
+                      ? "leaderboard-rank rank-leader"
+                      : "leaderboard-rank"
                   }
                 >
                   {mode === "OVERALL" ? team.overallRank : team.divisionRank}
                 </td>
-                <td className="rboard-team-name">{team.name}</td>
+                <td className="leaderboard-team-name">{team.name}</td>
                 <td
                   className={team.division ? DIVISION_CLASS[team.division] : ""}
                 >
@@ -412,7 +357,7 @@ function RunnersBoardPage() {
                 <td>{team.currentRunner?.sex ?? "—"}</td>
                 <td>{formatTimeOfDay(team.startTimeThisLeg)}</td>
                 <td>{team.totalLaps}</td>
-                <td className="rboard-distance">
+                <td className="leaderboard-distance">
                   {team.totalDistanceKm.toFixed(1)} km
                 </td>
                 <td>{formatLapMillis(team.teamLastLapMillis)}</td>
@@ -423,15 +368,15 @@ function RunnersBoardPage() {
         </table>
       </div>
 
-      <footer className="rboard-footer">
-        <div className="rboard-mode">
-          <span className="rboard-mode-label">Display Mode</span>
+      <footer className="leaderboard-footer">
+        <div className="leaderboard-mode">
+          <span className="leaderboard-mode-label">Display Mode</span>
           {MODES.map((m) => (
             <button
               key={m}
               type="button"
               className={
-                m === mode ? "rboard-mode-tab active" : "rboard-mode-tab"
+                m === mode ? "leaderboard-mode-tab active" : "leaderboard-mode-tab"
               }
               onClick={() => setMode(m)}
             >
@@ -444,4 +389,4 @@ function RunnersBoardPage() {
   );
 }
 
-export default RunnersBoardPage;
+export default LeaderboardPage;

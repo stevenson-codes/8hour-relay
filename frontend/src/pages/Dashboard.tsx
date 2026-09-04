@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import type { RaceStatus } from "../types/RaceStatus";
+import BoardHeader from "../components/BoardHeader";
 import type {
   RunnerRef,
   RunnerBoardStatus,
@@ -86,11 +86,6 @@ function Dashboard() {
   const [now, setNow] = useState(() => new Date());
   const [teams, setTeams] = useState<TeamBoard[] | null>(null);
   const [boardError, setBoardError] = useState<string | null>(null);
-  const [raceActive, setRaceActive] = useState<boolean | null>(null);
-  const [raceActionPending, setRaceActionPending] = useState(false);
-  const [clearPending, setClearPending] = useState(false);
-  const [wipePending, setWipePending] = useState(false);
-  const [controlsError, setControlsError] = useState<string | null>(null);
 
   useEffect(() => {
     const tick = setInterval(() => setNow(new Date()), 1000);
@@ -116,175 +111,15 @@ function Dashboard() {
     return () => clearInterval(intervalId);
   }, [loadBoard]);
 
-  const loadRaceStatus = useCallback(() => {
-    return fetch("/api/race/status")
-      .then((res) => {
-        if (!res.ok) throw new Error(`Request failed: ${res.status}`);
-        return res.json() as Promise<RaceStatus>;
-      })
-      .then((status) => {
-        setRaceActive(status.active);
-        setControlsError(null);
-      })
-      .catch((err: Error) => setControlsError(err.message));
-  }, []);
-
-  useEffect(() => {
-    loadRaceStatus();
-  }, [loadRaceStatus]);
-
-  const handleRaceToggle = useCallback(() => {
-    if (raceActive === null || raceActionPending) return;
-
-    const endpoint = raceActive ? "/api/race/stop" : "/api/race/start";
-    setRaceActionPending(true);
-    fetch(endpoint, { method: "POST" })
-      .then((res) => {
-        if (!res.ok) throw new Error(`Request failed: ${res.status}`);
-        return res.json() as Promise<RaceStatus>;
-      })
-      .then((status) => {
-        setRaceActive(status.active);
-        setControlsError(null);
-      })
-      .catch((err: Error) => setControlsError(err.message))
-      .finally(() => setRaceActionPending(false));
-  }, [raceActive, raceActionPending]);
-
-  const handleClearLapRecords = useCallback(() => {
-    if (raceActive !== false || clearPending) return;
-    if (
-      !window.confirm("This will permanently delete all lap records. Continue?")
-    )
-      return;
-
-    setClearPending(true);
-    fetch("/api/lap-records", { method: "DELETE" })
-      .then((res) => {
-        if (!res.ok) throw new Error(`Request failed: ${res.status}`);
-        setControlsError(null);
-        return loadBoard();
-      })
-      .catch((err: Error) => setControlsError(err.message))
-      .finally(() => setClearPending(false));
-  }, [raceActive, clearPending, loadBoard]);
-
-  const handleWipeDatabase = useCallback(() => {
-    if (raceActive !== false || wipePending) return;
-    if (
-      !window.confirm(
-        "This will permanently delete all teams, runners, tags, and lap records. Continue?",
-      )
-    )
-      return;
-
-    setWipePending(true);
-    fetch("/api/teams", { method: "DELETE" })
-      .then((res) => {
-        if (!res.ok) throw new Error(`Request failed: ${res.status}`);
-        setControlsError(null);
-        return loadBoard();
-      })
-      .catch((err: Error) => setControlsError(err.message))
-      .finally(() => setWipePending(false));
-  }, [raceActive, wipePending, loadBoard]);
-
   return (
     <div className="board">
-      <header className="board-header">
-        <div className="brand">
-          <svg
-            className="brand-mark"
-            width="34"
-            height="34"
-            viewBox="0 0 24 24"
-            fill="none"
-            aria-hidden="true"
-          >
-            <path
-              d="M2 18 8 8l3.2 5L14 9l8 9z"
-              stroke="currentColor"
-              strokeWidth="1.6"
-              strokeLinejoin="round"
-            />
-          </svg>
-          <span className="brand-name">
-            VANCOUVER
-            <br />
-            RUNAHOLICS
-          </span>
-        </div>
-
-        <div className="event-title">
-          <h1>BMAI Vancouver Runaholics 8-Hour Relay 2026</h1>
-          <p>All Teams Details</p>
-        </div>
-
-        <div className="header-right">
-          <span className="clock">
-            {now.toLocaleTimeString([], {
-              hour: "numeric",
-              minute: "2-digit",
-              second: "2-digit",
-            })}
-          </span>
-          <span className="live-indicator">
-            <span className="live-dot" />
-            Live
-          </span>
-          <div className="board-controls">
-            {(boardError || controlsError) && (
-              <span className="controls-error">
-                {boardError ?? controlsError}
-              </span>
-            )}
-            <Link to="/add-team" className="nav-link-button">
-              Add Team
-            </Link>
-            <Link to="/board" className="nav-link-button">
-              Board View
-            </Link>
-            <button
-              type="button"
-              className={raceActive ? "stop-button" : "start-button"}
-              onClick={handleRaceToggle}
-              disabled={raceActive === null || raceActionPending}
-            >
-              {raceActive === null
-                ? "Loading…"
-                : raceActive
-                  ? "Stop Race"
-                  : "Start Race"}
-            </button>
-            <button
-              type="button"
-              className="clear-button"
-              onClick={handleClearLapRecords}
-              disabled={raceActive !== false || clearPending}
-              title={
-                raceActive !== false
-                  ? "Stop the race before clearing lap records"
-                  : undefined
-              }
-            >
-              Clear Lap Records
-            </button>
-            <button
-              type="button"
-              className="clear-button"
-              onClick={handleWipeDatabase}
-              disabled={raceActive !== false || wipePending}
-              title={
-                raceActive !== false
-                  ? "Stop the race before wiping the database"
-                  : undefined
-              }
-            >
-              Clear All
-            </button>
-          </div>
-        </div>
-      </header>
+      <BoardHeader
+        title="BMAI Vancouver Runaholics 8-Hour Relay 2026"
+        now={now}
+        currentPage="dashboard"
+        boardError={boardError}
+        onBoardRefresh={loadBoard}
+      />
 
       <main className="teams">
         {teams === null && !boardError && (
@@ -336,7 +171,10 @@ function Dashboard() {
                 </span>
               </div>
 
-              <Link to={`/teams/${team.id}`} className="nav-link-button team-edit-link">
+              <Link
+                to={`/teams/${team.id}`}
+                className="nav-link-button team-edit-link"
+              >
                 Edit
               </Link>
             </div>
