@@ -6,6 +6,7 @@ import type {
   RunnerBoardStatus,
   TeamBoard,
 } from "../types/RaceBoard";
+import { READ_ONLY } from "../config";
 import "../App.css";
 
 const TEAM_COLORS = [
@@ -16,7 +17,7 @@ const TEAM_COLORS = [
   "#aa3bff",
   "#ff8a3b",
 ];
-const REFRESH_INTERVAL_MS = 15_000;
+const REFRESH_INTERVAL_MS = 1_000;
 
 function RunnerIcon({ className }: { className?: string }) {
   return (
@@ -74,7 +75,7 @@ function RunnerRefBadge({ runner }: { runner: RunnerRef }) {
   return (
     <>
       <RunnerIcon className="runner-ref-icon" />
-      <span className="runner-ref-leg">R{runner.leg}</span>
+      <span className="runner-ref-leg">{runner.leg}</span>
       <span className="runner-ref-name">{runner.name}</span>
       {runner.bib && <span className="runner-ref-bib">{runner.bib}</span>}
       {runner.sex && <span className="runner-ref-sex">{runner.sex}</span>}
@@ -171,12 +172,14 @@ function Dashboard() {
                 </span>
               </div>
 
-              <Link
-                to={`/teams/${team.id}`}
-                className="nav-link-button team-edit-link"
-              >
-                Edit
-              </Link>
+              {!READ_ONLY && (
+                <Link
+                  to={`/teams/${team.id}`}
+                  className="nav-link-button team-edit-link"
+                >
+                  Edit
+                </Link>
+              )}
             </div>
 
             <div className="team-card-current">
@@ -241,7 +244,7 @@ function Dashboard() {
                 <tbody>
                   {team.runners.map((runner) => (
                     <tr key={runner.leg} className={statusClass(runner.status)}>
-                      <td>R{runner.leg}</td>
+                      <td>{runner.leg}</td>
                       <td>{runner.name}</td>
                       <td>{runner.bib ?? "—"}</td>
                       <td>{runner.sex ?? "—"}</td>

@@ -2,7 +2,7 @@ package com.sbeve.relaytiming.mqtt;
 
 import java.nio.charset.StandardCharsets;
 
-import org.eclipse.paho.client.mqttv3.MqttCallback;
+import org.eclipse.paho.client.mqttv3.MqttCallbackExtended;
 import org.eclipse.paho.client.mqttv3.MqttClient;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
@@ -21,7 +21,7 @@ import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
 
 @Component
-public class TagReadListener implements MqttCallback {
+public class TagReadListener implements MqttCallbackExtended {
     private static final Logger log = LoggerFactory.getLogger(TagReadListener.class);
 
     private MqttClient mqttClient;
@@ -41,8 +41,6 @@ public class TagReadListener implements MqttCallback {
         options.setAutomaticReconnect(true);
 
         mqttClient.connect(options);
-        mqttClient.subscribe(Config.TAG_READS_TOPIC);
-        log.info("Subscribed to MQTT topic '{}' on broker {}", Config.TAG_READS_TOPIC, Config.BROKER_URL);
     }
 
     @PreDestroy
@@ -55,6 +53,17 @@ public class TagReadListener implements MqttCallback {
     @Override
     public void connectionLost(Throwable cause) {
         log.warn("Lost connection to MQTT broker at {}", Config.BROKER_URL, cause);
+    }
+
+    @Override
+    public void connectComplete(boolean reconnect, String serverURI) {
+        try {
+            mqttClient.subscribe(Config.TAG_READS_TOPIC);
+            log.info("{} to MQTT broker {}, subscribed to '{}'", reconnect ? "Reconnected" : "Connected",
+                    serverURI, Config.TAG_READS_TOPIC);
+        } catch (MqttException e) {
+            log.warn("Failed to subscribe to '{}' after connecting to {}", Config.TAG_READS_TOPIC, serverURI, e);
+        }
     }
 
     @Override

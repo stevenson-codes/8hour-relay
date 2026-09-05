@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import type { RaceStatus } from "../types/RaceStatus";
+import { READ_ONLY } from "../config";
 import "../App.css";
 
 const RACE_STATUS_REFRESH_MS = 5_000;
@@ -161,9 +162,11 @@ function BoardHeader({
             {boardError ?? controlsError}
           </span>
         )}
-        <Link to="/add-team" className="nav-link-button">
-          Add Team
-        </Link>
+        {!READ_ONLY && (
+          <Link to="/add-team" className="nav-link-button">
+            Add Team
+          </Link>
+        )}
         {currentPage !== "dashboard" && (
           <Link to="/" className="nav-link-button nav-toggle">
             Dashboard
@@ -174,44 +177,48 @@ function BoardHeader({
             Leaderboard
           </Link>
         )}
-        <button
-          type="button"
-          className={raceActive ? "stop-button" : "start-button"}
-          onClick={handleRaceToggle}
-          disabled={raceActive === null || raceActionPending}
-        >
-          {raceActive === null
-            ? "Loading…"
-            : raceActive
-              ? "Stop Race"
-              : "Start Race"}
-        </button>
-        <button
-          type="button"
-          className="clear-button"
-          onClick={handleClearLapRecords}
-          disabled={raceActive !== false || clearPending}
-          title={
-            raceActive !== false
-              ? "Stop the race before clearing lap records"
-              : undefined
-          }
-        >
-          Clear Lap Records
-        </button>
-        <button
-          type="button"
-          className="clear-button"
-          onClick={handleWipeDatabase}
-          disabled={raceActive !== false || wipePending}
-          title={
-            raceActive !== false
-              ? "Stop the race before wiping the database"
-              : undefined
-          }
-        >
-          Clear All
-        </button>
+        {!READ_ONLY && (
+          <>
+            <button
+              type="button"
+              className={raceActive ? "stop-button" : "start-button"}
+              onClick={handleRaceToggle}
+              disabled={raceActive === null || raceActionPending}
+            >
+              {raceActive === null
+                ? "Loading…"
+                : raceActive
+                  ? "Stop Race"
+                  : "Start Race"}
+            </button>
+            <button
+              type="button"
+              className="clear-button"
+              onClick={handleClearLapRecords}
+              disabled={raceActive !== false || clearPending}
+              title={
+                raceActive !== false
+                  ? "Stop the race before clearing lap records"
+                  : undefined
+              }
+            >
+              Clear Lap Records
+            </button>
+            <button
+              type="button"
+              className="clear-button"
+              onClick={handleWipeDatabase}
+              disabled={raceActive !== false || wipePending}
+              title={
+                raceActive !== false
+                  ? "Stop the race before wiping the database"
+                  : undefined
+              }
+            >
+              Clear All
+            </button>
+          </>
+        )}
       </div>
     </header>
   );

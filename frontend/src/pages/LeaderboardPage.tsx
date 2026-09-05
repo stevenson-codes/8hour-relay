@@ -160,7 +160,7 @@ function CurrentRunnerCell({ runner }: { runner: RunnerRef | null }) {
   return (
     <span className="runner-cell">
       <RunnerIcon className="runner-cell-icon" />
-      <span className="runner-cell-leg">R{runner.leg}</span>
+      <span className="runner-cell-leg">{runner.leg}</span>
       <span className="runner-cell-name">{runner.name}</span>
     </span>
   );
@@ -253,7 +253,9 @@ function LeaderboardPage() {
           </span>
         </div>
         <div className="leaderboard-stat">
-          <span className={`leaderboard-stat-icon ${raceActive ? "green" : "red"}`}>
+          <span
+            className={`leaderboard-stat-icon ${raceActive ? "green" : "red"}`}
+          >
             <FlagIcon />
           </span>
           <span className="leaderboard-stat-body">
@@ -376,7 +378,9 @@ function LeaderboardPage() {
               key={m}
               type="button"
               className={
-                m === mode ? "leaderboard-mode-tab active" : "leaderboard-mode-tab"
+                m === mode
+                  ? "leaderboard-mode-tab active"
+                  : "leaderboard-mode-tab"
               }
               onClick={() => setMode(m)}
             >
