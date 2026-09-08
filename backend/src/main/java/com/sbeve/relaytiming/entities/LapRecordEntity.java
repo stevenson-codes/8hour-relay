@@ -36,6 +36,12 @@ public class LapRecordEntity {
     @Column(nullable = false)
     private LapStatus status;
 
+    // Server clock time this record was created as the result of a handoff, or null if
+    // it wasn't. Kept separate from `timestamp` (the RFID reader's own clock, which
+    // isn't trustworthy for gating a cooldown measured against Instant.now()).
+    @Column(name = "handoff_at", nullable = true)
+    private Instant handoffAt;
+
     public LapRecordEntity() {
     }
 
@@ -80,5 +86,13 @@ public class LapRecordEntity {
 
     public void setStatus(LapStatus status) {
         this.status = status;
+    }
+
+    public Instant getHandoffAt() {
+        return handoffAt;
+    }
+
+    public void setHandoffAt(Instant handoffAt) {
+        this.handoffAt = handoffAt;
     }
 }

@@ -120,14 +120,44 @@ public class LapRecordService {
 
         RunnerEntity activeRunner = runnerStatus == RunnerStatus.ACTIVE ? runner : counterpart;
 
-        Instant raceStart = raceStateService.getStartedAt();
-        if (raceStart == null || lapRecord.getTimestamp().isBefore(raceStart)) {
+        Instant now = Instant.now();
+
+        // A handoff's own START record can itself still fall inside the same enabled
+        // window that let it through (e.g. the outgoing runner's tag lingers near the
+        // reader, or the newly active runner's first lap read lines up with the outgoing
+        // runner's last one). Without this, that can trigger a second handoff for the
+        // same team before the window that produced the first one closes. The window is
+        // HANDOFF_ENABLED_WINDOW wide on both sides of the leg boundary, so the cooldown
+        // needs to cover the full 2x span to guarantee it can't reopen mid-window.
+        // This reads back handoffAt (stamped with the server clock below), not
+        // lapRecord's own timestamp (the RFID reader's clock) - comparing a reader
+        // timestamp against Instant.now() here would be thrown off by reader clock skew,
+        // the same problem that made the leg-window check unreliable earlier.
+        Optional<LapRecordEntity> lastHandoff = lapRecordRepository
+                .findTopByTagAndHandoffAtIsNotNullOrderByHandoffAtDesc(activeRunner.getTag());
+        if (lastHandoff.isPresent()
+                && Duration.between(lastHandoff.get().getHandoffAt(), now)
+                        .compareTo(HANDOFF_ENABLED_WINDOW.multipliedBy(2)) < 0) {
             return;
         }
-        Duration sinceRaceStart = Duration.between(raceStart, lapRecord.getTimestamp());
-        long sinceLegStartMillis = sinceRaceStart.toMillis() % LEG_TIME.toMillis();
-        Duration untilNextLegStart = LEG_TIME.minusMillis(sinceLegStartMillis);
-        if (untilNextLegStart.compareTo(HANDOFF_ENABLED_WINDOW) > 0) {
+
+        Instant raceStart = raceStateService.getStartedAt();
+        if (raceStart == null || now.isBefore(raceStart)) {
+            return;
+        }
+        Duration sinceRaceStart = Duration.between(raceStart, now);
+
+        // Race start (t=0) isn't a real leg boundary - there's no leg before it to hand
+        // off from - but it lands on one via the modulo below, which would otherwise open
+        // a bogus window from t=0 to HANDOFF_ENABLED_WINDOW.
+        if (sinceRaceStart.compareTo(HANDOFF_ENABLED_WINDOW) < 0) {
+            return;
+        }
+        Duration sinceLegStart = Duration.ofMillis(sinceRaceStart.toMillis() % LEG_TIME.toMillis());
+        Duration untilNextLegStart = LEG_TIME.minus(sinceLegStart);
+        Duration distanceToLegBoundary = sinceLegStart.compareTo(untilNextLegStart) < 0 ? sinceLegStart
+                : untilNextLegStart;
+        if (distanceToLegBoundary.compareTo(HANDOFF_ENABLED_WINDOW) > 0) {
             return;
         }
 
@@ -147,6 +177,7 @@ public class LapRecordService {
 
         nextLap.setStatus(LapStatus.START);
         nextLap.setLapTime(null);
+        nextLap.setHandoffAt(now);
         lapRecordRepository.save(nextLap);
 
         activeRunner.setStatus(RunnerStatus.INACTIVE);

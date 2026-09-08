@@ -14,6 +14,7 @@ public interface LapRecordRepository extends JpaRepository<LapRecordEntity, Long
     Optional<LapRecordEntity> findTopByTagEpcHexAndStatusInOrderByTimestampDesc(String epcHex, Collection<LapStatus> statuses);
     Optional<LapRecordEntity> findTopByTagEpcHexOrderByTimestampDesc(String epcHex);
     Optional<LapRecordEntity> findTopByTagAndStatusOrderByTimestampDesc(TagEntity tag, LapStatus status);
+    Optional<LapRecordEntity> findTopByTagAndHandoffAtIsNotNullOrderByHandoffAtDesc(TagEntity tag);
     List<LapRecordEntity> findByTagAndStatus(TagEntity tag, LapStatus status);
     void deleteByTag(TagEntity tag);
 }

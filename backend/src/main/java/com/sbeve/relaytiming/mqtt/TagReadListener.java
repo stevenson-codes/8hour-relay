@@ -31,6 +31,8 @@ public class TagReadListener implements MqttCallbackExtended {
         this.tagReadService = tagReadService;
     }
 
+    private static final int CONNECT_RETRY_DELAY_SECONDS = 5;
+
     @PostConstruct
     public void connect() throws MqttException {
         mqttClient = new MqttClient(Config.BROKER_URL, Config.CLIENT_ID, new MemoryPersistence());
@@ -40,7 +42,26 @@ public class TagReadListener implements MqttCallbackExtended {
         options.setCleanSession(true);
         options.setAutomaticReconnect(true);
 
-        mqttClient.connect(options);
+        // MqttClient.connect() does not benefit from setAutomaticReconnect(true) -
+        // that option only retries a connection lost after it was first established.
+        // On a fresh `docker compose up`, the broker container can still be starting
+        // when this runs, so retry the initial connect ourselves instead of letting
+        // it fail startup outright.
+        while (true) {
+            try {
+                mqttClient.connect(options);
+                return;
+            } catch (MqttException e) {
+                log.warn("Could not connect to MQTT broker at {}, retrying in {}s", Config.BROKER_URL,
+                        CONNECT_RETRY_DELAY_SECONDS, e);
+                try {
+                    Thread.sleep(CONNECT_RETRY_DELAY_SECONDS * 1000L);
+                } catch (InterruptedException interrupted) {
+                    Thread.currentThread().interrupt();
+                    throw e;
+                }
+            }
+        }
     }
 
     @PreDestroy

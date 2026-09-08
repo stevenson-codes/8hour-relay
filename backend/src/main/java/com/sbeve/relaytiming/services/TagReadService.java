@@ -67,15 +67,20 @@ public class TagReadService {
     }
 
     private void flushRead(String passKey, Instant windowStart) {
-        readWindow.compute(passKey, (key, currentBest) -> {
-            if (currentBest == null) {
-                return currentBest;
-            }
+        try {
+            readWindow.compute(passKey, (key, currentBest) -> {
+                if (currentBest == null) {
+                    return currentBest;
+                }
 
-            log.info("Tag {} strongest read in {}s window: {} cdBm", passKey, READ_WINDOW, currentBest.peakRssiCdbm());
-            lapRecordService.saveLapRecord(passKey, currentBest.timestamp());
-            return null;
-        });
+                log.info("Tag {} strongest read in {}s window: {} cdBm", passKey, READ_WINDOW,
+                        currentBest.peakRssiCdbm());
+                lapRecordService.saveLapRecord(passKey, currentBest.timestamp());
+                return null;
+            });
+        } catch (Exception e) {
+            log.error("Failed to flush read for tag {}", passKey, e);
+        }
     }
 
     @PreDestroy

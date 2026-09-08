@@ -7,8 +7,8 @@ public class Config {
 
     public static final Long HANDOFF_WINDOW = 500L; // in milliseconds
     public static final Long READ_WINDOW = 5L; // in seconds
-    public static final Long HANDOFF_ENABLED_WINDOW = 3L; // in minutes
-    public static final Long LEG_TIME = 4L; // in minutes
+    public static final Long HANDOFF_ENABLED_WINDOW = 1L; // in minutes
+    public static final Long LEG_TIME = 3L; // in minutes
     public static final double LAP_DISTANCE_KM = 0.4;
     public static final Long LEG_TIMEOUT = 10L; // in minutes
 
