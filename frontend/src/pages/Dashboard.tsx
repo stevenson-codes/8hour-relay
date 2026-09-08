@@ -1,11 +1,13 @@
 import { useCallback, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import BoardHeader from "../components/BoardHeader";
+import RaceStatsBar from "../components/RaceStatsBar";
 import type {
   RunnerRef,
   RunnerBoardStatus,
   TeamBoard,
 } from "../types/RaceBoard";
+import type { RaceStatus } from "../types/RaceStatus";
 import { READ_ONLY } from "../config";
 import "../App.css";
 
@@ -87,6 +89,7 @@ function Dashboard() {
   const [now, setNow] = useState(() => new Date());
   const [teams, setTeams] = useState<TeamBoard[] | null>(null);
   const [boardError, setBoardError] = useState<string | null>(null);
+  const [raceStatus, setRaceStatus] = useState<RaceStatus | null>(null);
 
   useEffect(() => {
     const tick = setInterval(() => setNow(new Date()), 1000);
@@ -120,7 +123,10 @@ function Dashboard() {
         currentPage="dashboard"
         boardError={boardError}
         onBoardRefresh={loadBoard}
+        onRaceStatusChange={setRaceStatus}
       />
+
+      <RaceStatsBar now={now} raceStatus={raceStatus} />
 
       <main className="teams">
         {teams === null && !boardError && (

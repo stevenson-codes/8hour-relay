@@ -1,12 +1,12 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import BoardHeader from "../components/BoardHeader";
+import RaceStatsBar from "../components/RaceStatsBar";
 import type { Division, RunnerRef, TeamBoard } from "../types/RaceBoard";
 import type { RaceStatus } from "../types/RaceStatus";
 import "../App.css";
 import "./LeaderboardPage.css";
 
 const SUMMARY_REFRESH_MS = 2_000;
-const RACE_DURATION_MS = 8 * 60 * 60 * 1000;
 const MAX_ROWS = 20;
 
 const MODES = ["OVERALL", "OPEN", "MIXED", "MASTERS"] as const;
@@ -17,73 +17,6 @@ const DIVISION_CLASS: Record<Division, string> = {
   MIXED: "division-mixed",
   MASTERS: "division-masters",
 };
-
-function ClockIcon() {
-  return (
-    <svg
-      width="22"
-      height="22"
-      viewBox="0 0 24 24"
-      fill="none"
-      aria-hidden="true"
-    >
-      <circle cx="12" cy="12" r="9" stroke="currentColor" strokeWidth="1.6" />
-      <path
-        d="M12 7v5l3.5 2"
-        stroke="currentColor"
-        strokeWidth="1.6"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
-  );
-}
-
-function HourglassIcon() {
-  return (
-    <svg
-      width="22"
-      height="22"
-      viewBox="0 0 24 24"
-      fill="none"
-      aria-hidden="true"
-    >
-      <path
-        d="M6 3h12M6 21h12M7 3c0 5 5 6 5 9s-5 4-5 9M17 3c0 5-5 6-5 9s5 4 5 9"
-        stroke="currentColor"
-        strokeWidth="1.6"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
-  );
-}
-
-function FlagIcon() {
-  return (
-    <svg
-      width="22"
-      height="22"
-      viewBox="0 0 24 24"
-      fill="none"
-      aria-hidden="true"
-    >
-      <path
-        d="M5 21V4"
-        stroke="currentColor"
-        strokeWidth="1.6"
-        strokeLinecap="round"
-      />
-      <path
-        d="M5 4h13l-3 4 3 4H5"
-        stroke="currentColor"
-        strokeWidth="1.6"
-        strokeLinejoin="round"
-        strokeLinecap="round"
-      />
-    </svg>
-  );
-}
 
 function RefreshIcon() {
   return (
@@ -119,19 +52,6 @@ function RunnerIcon({ className }: { className?: string }) {
       <path d="M17.4 10.2a1.6 1.6 0 0 0-1.4-.9l-4-.3-2.9 2.6a1 1 0 0 0 1.3 1.5l2.3-2.1 1.2 1.7-3.6 3.4-.6 5.6a1 1 0 0 0 2 .2l.7-4.9 2.3-2.1 1.1 3.7a1 1 0 0 0 1.9-.6zM8.9 13.9l-2.8 2.6a1 1 0 1 0 1.4 1.5l3.1-2.9z" />
     </svg>
   );
-}
-
-function pad2(n: number): string {
-  return n.toString().padStart(2, "0");
-}
-
-function formatDuration(ms: number | null): string {
-  if (ms === null) return "—";
-  const totalSeconds = Math.max(0, Math.floor(ms / 1000));
-  const h = Math.floor(totalSeconds / 3600);
-  const m = Math.floor((totalSeconds % 3600) / 60);
-  const s = totalSeconds % 60;
-  return `${pad2(h)}:${pad2(m)}:${pad2(s)}`;
 }
 
 function formatLapMillis(millis: number | null): string {
@@ -198,13 +118,6 @@ function LeaderboardPage() {
     return () => clearInterval(intervalId);
   }, [loadBoard]);
 
-  const raceActive = raceStatus?.active ?? false;
-  const elapsedMs =
-    raceActive && raceStatus?.startedAt
-      ? now.getTime() - new Date(raceStatus.startedAt).getTime()
-      : null;
-  const remainingMs = elapsedMs === null ? null : RACE_DURATION_MS - elapsedMs;
-
   const visibleTeams = useMemo(() => {
     if (!teams) return [];
     const filtered =
@@ -229,59 +142,7 @@ function LeaderboardPage() {
         onRaceStatusChange={setRaceStatus}
       />
 
-      <div className="leaderboard-stats">
-        <div className="leaderboard-stat">
-          <span className="leaderboard-stat-icon cyan">
-            <ClockIcon />
-          </span>
-          <span className="leaderboard-stat-body">
-            <span className="leaderboard-stat-label">Race Time</span>
-            <span className="leaderboard-stat-value">
-              {formatDuration(elapsedMs)}
-            </span>
-          </span>
-        </div>
-        <div className="leaderboard-stat">
-          <span className="leaderboard-stat-icon amber">
-            <HourglassIcon />
-          </span>
-          <span className="leaderboard-stat-body">
-            <span className="leaderboard-stat-label">Time Remaining</span>
-            <span className="leaderboard-stat-value amber">
-              {formatDuration(remainingMs)}
-            </span>
-          </span>
-        </div>
-        <div className="leaderboard-stat">
-          <span
-            className={`leaderboard-stat-icon ${raceActive ? "green" : "red"}`}
-          >
-            <FlagIcon />
-          </span>
-          <span className="leaderboard-stat-body">
-            <span className="leaderboard-stat-label">Race Status</span>
-            <span
-              className={`leaderboard-stat-value ${raceActive ? "green" : "red"}`}
-            >
-              {raceActive ? "Racing" : "Stopped"}
-            </span>
-          </span>
-        </div>
-        <div className="leaderboard-stat">
-          <span className="leaderboard-stat-icon cyan">
-            <ClockIcon />
-          </span>
-          <span className="leaderboard-stat-body">
-            <span className="leaderboard-stat-label">Local Time</span>
-            <span className="leaderboard-stat-value">
-              {now.toLocaleTimeString([], {
-                hour: "numeric",
-                minute: "2-digit",
-              })}
-            </span>
-          </span>
-        </div>
-      </div>
+      <RaceStatsBar now={now} raceStatus={raceStatus} />
 
       <div className="leaderboard-table-header">
         <h2>
