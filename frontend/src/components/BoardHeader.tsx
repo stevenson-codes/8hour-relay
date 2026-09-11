@@ -55,6 +55,7 @@ function BoardHeader({
 
   const handleRaceToggle = useCallback(() => {
     if (raceActive === null || raceActionPending) return;
+    if (raceActive && !window.confirm("This will stop the race. Continue?")) return;
 
     const endpoint = raceActive ? "/api/race/stop" : "/api/race/start";
     setRaceActionPending(true);
