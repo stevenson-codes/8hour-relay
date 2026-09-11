@@ -1,0 +1,133 @@
+﻿first_name,last_name,shirt_size,team_name,division,position,bib_number,Chip No.,Team Chip,Gender
+Liam,Watson,L,Cheetah,open,1,A01,08951,08940,male
+Jian-Ting,Liou,M,Cheetah,open,2,A02,08952,08940,male
+Tommy,Tse,M,Cheetah,open,3,A03,08953,08940,male
+Daniel,Zhang,M,Cheetah,open,4,A04,08954,08940,male
+Victor,Zhang,L,Cheetah,open,5,A05,08955,08940,male
+Junyang,Zhou,S,Cheetah,open,6,A06,08956,08940,male
+Matthew,Daniel Brown,S,Cheetah,open,7,A07,08957,08940,male
+Ingo,Sibbe,L,Cheetah,open,8,A08,08958,08940,male
+Herbert,Ma,M,FortiRunners,open,1,B01,08941,09037,male
+Kuan Long,Leong,S,FortiRunners,open,2,B02,08942,09037,male
+Brian,Roy,S,FortiRunners,open,3,B03,08943,09037,male
+Andrew,Ha,M,FortiRunners,open,4,B04,08944,09037,male
+Zhenyang,Zhang,M,FortiRunners,open,5,B05,08945,09037,male
+Andrew,Yan,M,FortiRunners,open,6,B06,08946,09037,male
+Jeffery,Wong,S,FortiRunners,open,7,B07,08947,09037,male
+Chris,Tse,M,FortiRunners,open,8,B08,08948,09037,male
+Jason,Shen,S,Vancouver Runaholics,open,1,I01,08901,09013,male
+Casper,Chen,M,Vancouver Runaholics,open,2,I02,08902,09013,male
+Yi,Wang,M,Vancouver Runaholics,open,3,I03,08903,09013,male
+Victor,Qin,M,Vancouver Runaholics,open,4,I04,08904,09013,male
+Zhixue,Huang,M,Vancouver Runaholics,open,5,I05,08905,09013,male
+George,Huang,M,Vancouver Runaholics,open,6,I06,08906,09013,male
+Navy,Chen,S,Vancouver Runaholics,open,7,I07,08907,09013,male
+Allen,Xu,M,Vancouver Runaholics,open,8,I08,08908,09013,male
+Pierre,Castro,M,VR Champion,open,1,J01,08911,09005,male
+Anna,Wu,S,VR Champion,open,2,J02,08912,09005,female
+bee,manimtim,M,VR Champion,open,3,J03,08913,09005,male
+Felix,Luk,M,VR Champion,open,4,J04,08914,09005,male
+Peter,Li,L,VR Champion,open,5,J05,08915,09005,male
+Shawn,Li,L,VR Champion,open,6,J06,08916,09005,male
+Ryan,Zhang,L,VR Champion,open,7,J07,08917,09005,male
+YONGQIAN,ZHANG,M,VR Champion,open,8,J08,08918,09005,male
+,,,,,,,,,
+first_name,last_name,shirt_size,team_name,division,position,bib_number,Chip No.,Team Chip,Gender
+Sean,Sun,L,ForLazy Legs,mixed,1,A01,08921,09014,male
+Sarah,Wong,S,ForLazy Legs,mixed,2,A02,08922,09014,female
+Maryam,Abbasi,M,ForLazy Legs,mixed,3,A03,08923,09014,female
+Leonardo,Tagle,L,ForLazy Legs,mixed,4,A04,08924,09014,male
+Jing,Che,M,ForLazy Legs,mixed,5,A05,08925,09014,female
+Tao,Shen,S,ForLazy Legs,mixed,6,A06,08926,09014,male
+Ai-ling,XU,S,ForLazy Legs,mixed,7,A07,08927,09014,female
+Wenkai,Du,L,ForLazy Legs,mixed,8,A08,08928,09014,male
+Gabriel,Hung,M,Forti∞,mixed,1,B01,06441,09027,male
+Grace,Wong,S,Forti∞,mixed,2,B02,06442,09027,female
+Ellen,Luo,S,Forti∞,mixed,3,B03,06443,09027,female
+Qiufeng,Zhang,L,Forti∞,mixed,4,B04,06444,09027,male
+Lu,Wei,S,Forti∞,mixed,5,B05,06445,09027,female
+Winnie,He,M,Forti∞,mixed,6,B06,06446,09027,female
+Edward,Fan,M,Forti∞,mixed,7,B07,06447,09027,male
+Yunfei,Ma,XL,Forti∞,mixed,8,B08,06448,09027,male
+Fiona,Tie,S,FortiPing,mixed,1,C01,09061,09028,female
+BIN,FAN,M,FortiPing,mixed,2,C02,09062,09028,male
+Chuxin,Chen,S,FortiPing,mixed,3,C03,09063,09028,female
+Alvin,Leong,M,FortiPing,mixed,4,C04,09064,09028,male
+Carol,Chang,S,FortiPing,mixed,5,C05,09065,09028,female
+Penny,Fu,S,FortiPing,mixed,6,C06,09066,09028,female
+steven,Yan,M,FortiPing,mixed,7,C07,09067,09028,male
+Hanson,Diao,XL,FortiPing,mixed,8,C08,09068,09028,male
+Nannan,Shu,S,Foxy,mixed,1,D01,09041,09097,female
+Cindy,Zhang,L,Foxy,mixed,2,D02,09042,09097,female
+Michael,Wan,L,Foxy,mixed,3,D03,09043,09097,male
+Kiki,Tsai,XL,Foxy,mixed,4,D04,09044,09097,female
+Yang,Qin,M,Foxy,mixed,5,D05,09045,09097,female
+Fei,Kong,S,Foxy,mixed,6,D06,09046,09097,male
+Bing,Xu,M,Foxy,mixed,7,D07,09047,09097,male
+Xiang,Yu,M,Foxy,mixed,8,D08,09048,09097,male
+Sophia,Liu,S,Team SU,mixed,1,E01,09081,09000,female
+Junfeng,Zhang,S,Team SU,mixed,2,E02,09082,09000,male
+Mengdi,Zhu,S,Team SU,mixed,3,E03,09084,09000,female
+Liangbin,Wang,S,Team SU,mixed,4,E04,09085,09000,male
+Ying,Zhang,S,Team SU,mixed,5,E05,09088,09000,female
+Hongzhao,Han,M,Team SU,mixed,6,E06,09030,09000,male
+Jessie,Yang,S,Team SU,mixed,7,E07,09059,09000,female
+Da,Chen,M,Team SU,mixed,8,E08,09073,09000,male
+cora,cao,S,VR Run As One,mixed,1,F01,08930,09017,female
+Johnny,Zhou,M,VR Run As One,mixed,2,F02,09032,09017,male
+Jenny,Ren,S,VR Run As One,mixed,3,F03,09033,09017,female
+Kostya,Chzhan,S,VR Run As One,mixed,4,F04,09034,09017,male
+Zinan,Liu,S,VR Run As One,mixed,5,F05,09035,09017,female
+AJ,Qin,M,VR Run As One,mixed,6,F06,09036,09017,male
+Emily,Morley,S,VR Run As One,mixed,7,F07,09038,09017,female
+Zach,Xiao,M,VR Run As One,mixed,8,F08,08939,09017,male
+,,,,,,,,,
+first_name,last_name,shirt_size,team_name,division,position,bib_number,Chip No.,Team Chip,Gender
+May,WANG,S,Cha Siu Baos,master,1,A01,08967,09093,female
+Sinh,Johnston,S,Cha Siu Baos,master,2,A02,08968,09093,female
+Noriko,Sato,M,Cha Siu Baos,master,3,A03,08969,09093,female
+YD,You,M,Cha Siu Baos,master,4,A04,08970,09093,male
+Lawrence,Wu,XXL,Cha Siu Baos,master,5,A05,08971,09093,male
+Jose,Gimenez,L,Cha Siu Baos,master,6,A06,08972,09093,male
+Damian,Wan,L,Cha Siu Baos,master,7,A07,08973,09093,male
+Shinya,Koizumi,L,Cha Siu Baos,master,8,A08,08974,09093,male
+Ricky,Sui,M,iRUN Club,master,1,B01,08959,09029,male
+Liz,Zhu,S,iRUN Club,master,2,B02,08960,09029,female
+Frank,Zhang,S,iRUN Club,master,3,B03,08961,09029,male
+Mandy,Li,S,iRUN Club,master,4,B04,08962,09029,female
+Kexiong,Xie,S,iRUN Club,master,5,B05,08963,09029,male
+Lianhui,Huang,M,iRUN Club,master,6,B06,08964,09029,male
+Luke J,Li,M,iRUN Club,master,7,B07,08965,09029,male
+Jeremy,Brown,M,iRUN Club,master,8,B08,08966,09029,male
+Song,Dan,M,Lightening,master,1,C01,08983,08999,female
+Yan,Liu,S,Lightening,master,2,C02,08984,08999,female
+Cao Yang,Zou,L,Lightening,master,3,C03,08985,08999,male
+XIN WEI,ZHANG,S,Lightening,master,4,C04,08986,08999,male
+Axu,Wen,M,Lightening,master,5,C05,08987,08999,male
+Lilly,Ding,L,Lightening,master,6,C06,08988,08999,female
+Min,Liu,L,Lightening,master,7,C07,08989,08999,male
+Tina,Chen,S,Lightening,master,8,C08,08990,08999,female
+Lucy,Li,S,PNOA Run and Fun,master,1,D01,08975,09026,female
+Patty,Chen,M,PNOA Run and Fun,master,2,D02,08976,09026,female
+Yaya,chen,S,PNOA Run and Fun,master,3,D03,08977,09026,female
+Jianyong,CHEN,M,PNOA Run and Fun,master,4,D04,08978,09026,male
+Richard,Xiong,M,PNOA Run and Fun,master,5,D05,08979,09026,male
+David,LinWei,L,PNOA Run and Fun,master,6,D06,08980,09026,male
+Karen,Zhang,S,PNOA Run and Fun,master,7,D07,08981,09026,female
+Feifei,Wang,S,PNOA Run and Fun,master,8,D08,08982,09026,female
+Shihong,Ni,S,SU VINTAGE SPEED,master,1,E01,09051,09003,female
+Todd,Zhang,S,SU VINTAGE SPEED,master,2,E02,09052,09003,male
+Yan,Wang,S,SU VINTAGE SPEED,master,3,E03,09053,09003,female
+Peng,Sun,M,SU VINTAGE SPEED,master,4,E04,09054,09003,male
+Donghui,Li,S,SU VINTAGE SPEED,master,5,E05,09055,09003,female
+Wenbin,He,M,SU VINTAGE SPEED,master,6,E06,09056,09003,male
+Josie,You,M,SU VINTAGE SPEED,master,7,E07,09057,09003,female
+Eric,Zhao,L,SU VINTAGE SPEED,master,8,E08,09058,09003,male
+Andrew,Li,M,UBC Masters,master,1,F01,08991,09072,male
+Mei,Yang,M,UBC Masters,master,2,F02,08992,09072,female
+Helen,Zeng,S,UBC Masters,master,3,F03,08993,09072,female
+Ting,Zhang,S,UBC Masters,master,4,F04,08994,09072,female
+Elbert,Qi,L,UBC Masters,master,5,F05,08995,09072,male
+Sydney,Wang,S,UBC Masters,master,6,F06,08996,09072,female
+Matheson,Ma,L,UBC Masters,master,7,F07,08997,09072,male
+Haitao,Sheng,L,UBC Masters,master,8,F08,08998,09072,male
