@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
@@ -103,13 +104,7 @@ public class RaceSummaryService {
                 .map(LapRecordEntity::getTimestamp)
                 .orElse(null);
 
-        Instant lastRecordTimestamp = lapRecordRepository
-                .findTopByTagEpcHexOrderByTimestampDesc(runner.getTag().getEpcHex())
-                .map(LapRecordEntity::getTimestamp)
-                .orElse(null);
-
-        return new RunnerAgg(runner, laps, lastLapMillis, bestLapMillis, avgLapMillis, turnCount, legStart,
-                lastRecordTimestamp);
+        return new RunnerAgg(runner, laps, lastLapMillis, bestLapMillis, avgLapMillis, turnCount, legStart);
     }
 
     private TeamAgg buildTeamAgg(TeamEntity team, List<RunnerAgg> runnerAggs) {
@@ -144,8 +139,11 @@ public class RaceSummaryService {
                 .map(r -> r.runner().getLeg() == teamSize ? 1 : r.runner().getLeg() + 1)
                 .orElse(1);
 
+        Map<Integer, RunnerAgg> runnerAggsByLeg = runnerAggs.stream()
+                .collect(Collectors.toMap(agg -> agg.runner().getLeg(), agg -> agg));
+
         List<RunnerSummaryDto> runnerDtos = runnerAggs.stream()
-                .map(agg -> buildRunnerSummaryDto(agg, currentAgg, nextLeg))
+                .map(agg -> buildRunnerSummaryDto(agg, currentAgg, nextLeg, runnerAggsByLeg, teamSize))
                 .toList();
 
         RunnerDto currentRunnerRef = currentAgg.map(this::toRunner).orElse(null);
@@ -164,7 +162,8 @@ public class RaceSummaryService {
                 teamLastLapMillis, avgPaceSecPerKm, runnerDtos);
     }
 
-    private RunnerSummaryDto buildRunnerSummaryDto(RunnerAgg agg, Optional<RunnerAgg> currentAgg, int nextLeg) {
+    private RunnerSummaryDto buildRunnerSummaryDto(RunnerAgg agg, Optional<RunnerAgg> currentAgg, int nextLeg,
+            Map<Integer, RunnerAgg> runnerAggsByLeg, int teamSize) {
         RunnerEntity runner = agg.runner();
         boolean isCurrent = currentAgg.isPresent() && currentAgg.get().runner().getId().equals(runner.getId());
         boolean isNext = !isCurrent && runner.getLeg() == nextLeg;
@@ -189,7 +188,15 @@ public class RaceSummaryService {
                 ? null
                 : Math.round((agg.avgLapMillis() / 1000.0) / LAP_DISTANCE_KM);
 
-        Instant legEnd = isCurrent ? null : (agg.turnCount() > 0 ? agg.lastRecordTimestamp() : null);
+        // The runner's own last tag read isn't a reliable leg-end time: once inactive, a
+        // lingering/stray read near the reader still logs an INVALID lap record and would
+        // push lastRecordTimestamp later than when the leg actually ended. The handoff
+        // moment - i.e. when the next runner in the rotation started - is the true end.
+        Instant legEnd = null;
+        if (!isCurrent && agg.turnCount() > 0) {
+            int handoffLeg = runner.getLeg() == teamSize ? 1 : runner.getLeg() + 1;
+            legEnd = runnerAggsByLeg.get(handoffLeg).legStart();
+        }
 
         return new RunnerSummaryDto(runner.getLeg(), runner.getName(), runner.getBib(),
                 runner.getSex() == null ? null : runner.getSex().name(), status, statusLabel, agg.laps(),

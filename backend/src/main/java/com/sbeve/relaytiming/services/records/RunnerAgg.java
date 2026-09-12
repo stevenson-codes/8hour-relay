@@ -11,6 +11,5 @@ public record RunnerAgg(
         Long bestLapMillis,
         Long avgLapMillis,
         int turnCount,
-        Instant legStart,
-        Instant lastRecordTimestamp) {
+        Instant legStart) {
 }
