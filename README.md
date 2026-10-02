@@ -215,6 +215,44 @@ Newest at the bottom.
   which stays untouched so reader-clock-based lap-time math elsewhere isn't
   affected.
 
+## Future improvements
+
+Things known to be worth doing but out of scope for this version, either
+because they were discovered too late or didn't fit the time constraints.
+
+- **Switch the reader from DHCP to mDNS.** The reader's address-discovery
+  issues (see [Known issues](#known-issues-encountered--fixes)) turned out to
+  be a DHCP problem that mDNS resolves cleanly — found only after digging
+  into the reader's networking capabilities more closely than there was time
+  for during the original build. Worth revisiting as a proper fix rather
+  than working around it.
+- **Sync both backend and reader to an NTP server.** The clock-skew bug in
+  [Known issues](#known-issues-encountered--fixes) was patched by gating
+  handoffs on the server's receipt time instead of the reader's embedded
+  timestamp, but that's a workaround, not a fix — the two clocks were still
+  misaligned by several minutes. The reader supports NTP natively, so syncing
+  both it and the backend to the same NTP server removes the skew at the
+  source. Hosting an NTP server in its own container is probably the
+  cleanest path; the alternative is having the backend sync via an NTP
+  session directly, which needs more investigation.
+- **Cloud hosting via a direct Wi-Fi connection.** A USB Wi-Fi adapter
+  supported by the reader has been purchased to let it reach the internet
+  directly, but enabling it disables the reader's Ethernet/LAN connection.
+  How to reach the reader's web UI to configure Wi-Fi in the first place, if
+  not already connected over Ethernet, still needs investigation. Once
+  solved, this lets the whole stack (containers and frontend) move to a
+  cloud host like AWS, for better reliability and easier testing than a
+  laptop running everything locally at the event.
+- **Simplify the handoff logic.** Time constraints meant the handoff
+  requirements going into this version weren't refined enough, so
+  `checkHandoff`'s three gates (see
+  [Handoff detection](#handoff-detection-laprecordservicecheckhandoff)) are
+  more complex than the actual failure modes warrant — volunteers staffing
+  the handoff zone already rule out most misreads by hand. The logic can
+  likely be simplified significantly, relying more on race guidelines and
+  manual correction in the admin board to catch the rare false read, rather
+  than trying to make the automatic detection airtight.
+
 ## Running with Docker
 
 Start postgres, mosquitto, backend, and both frontends together:
