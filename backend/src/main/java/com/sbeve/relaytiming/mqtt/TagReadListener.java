@@ -1,0 +1,111 @@
+package com.sbeve.relaytiming.mqtt;
+
+import java.nio.charset.StandardCharsets;
+
+import org.eclipse.paho.client.mqttv3.MqttCallbackExtended;
+import org.eclipse.paho.client.mqttv3.MqttClient;
+import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
+import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
+import org.eclipse.paho.client.mqttv3.MqttException;
+import org.eclipse.paho.client.mqttv3.MqttMessage;
+import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
+import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
+
+import com.sbeve.relaytiming.config.Config;
+import com.sbeve.relaytiming.services.TagReadService;
+
+import jakarta.annotation.PostConstruct;
+import jakarta.annotation.PreDestroy;
+
+@Component
+public class TagReadListener implements MqttCallbackExtended {
+    private static final Logger log = LoggerFactory.getLogger(TagReadListener.class);
+
+    private MqttClient mqttClient;
+    private final TagReadService tagReadService;
+
+    public TagReadListener(TagReadService tagReadService) {
+        this.tagReadService = tagReadService;
+    }
+
+    private static final int CONNECT_RETRY_DELAY_SECONDS = 5;
+
+    @PostConstruct
+    public void connect() throws MqttException {
+        mqttClient = new MqttClient(Config.BROKER_URL, Config.CLIENT_ID, new MemoryPersistence());
+        mqttClient.setCallback(this);
+
+        MqttConnectOptions options = new MqttConnectOptions();
+        options.setCleanSession(true);
+        options.setAutomaticReconnect(true);
+
+        // MqttClient.connect() does not benefit from setAutomaticReconnect(true) -
+        // that option only retries a connection lost after it was first established.
+        // On a fresh `docker compose up`, the broker container can still be starting
+        // when this runs, so retry the initial connect ourselves instead of letting
+        // it fail startup outright.
+        while (true) {
+            try {
+                mqttClient.connect(options);
+                return;
+            } catch (MqttException e) {
+                log.warn("Could not connect to MQTT broker at {}, retrying in {}s", Config.BROKER_URL,
+                        CONNECT_RETRY_DELAY_SECONDS, e);
+                try {
+                    Thread.sleep(CONNECT_RETRY_DELAY_SECONDS * 1000L);
+                } catch (InterruptedException interrupted) {
+                    Thread.currentThread().interrupt();
+                    throw e;
+                }
+            }
+        }
+    }
+
+    @PreDestroy
+    public void disconnect() throws MqttException {
+        if (mqttClient != null && mqttClient.isConnected()) {
+            mqttClient.disconnect();
+        }
+    }
+
+    @Override
+    public void connectionLost(Throwable cause) {
+        log.warn("Lost connection to MQTT broker at {}", Config.BROKER_URL, cause);
+    }
+
+    @Override
+    public void connectComplete(boolean reconnect, String serverURI) {
+        try {
+            mqttClient.subscribe(Config.TAG_READS_TOPIC);
+            log.info("{} to MQTT broker {}, subscribed to '{}'", reconnect ? "Reconnected" : "Connected",
+                    serverURI, Config.TAG_READS_TOPIC);
+        } catch (MqttException e) {
+            log.warn("Failed to subscribe to '{}' after connecting to {}", Config.TAG_READS_TOPIC, serverURI, e);
+        }
+    }
+
+    @Override
+    public void messageArrived(String topic, MqttMessage message) {
+        String payload = new String(message.getPayload(), StandardCharsets.UTF_8);
+
+        JSONObject json;
+        try {
+            json = new JSONObject(payload);        String timestamp = json.getString("timestamp");
+            JSONObject tagInventoryEvent = json.getJSONObject("tagInventoryEvent");
+            String epcHex = tagInventoryEvent.getString("epcHex");
+            int peakRssiCdbm = tagInventoryEvent.getInt("peakRssiCdbm");
+
+            tagReadService.handleTagRead(epcHex, timestamp, peakRssiCdbm);
+        } catch (Exception e) {
+            log.warn("Failed to parse tag event on '{}': {}", topic, payload, e);
+            return;
+        }
+    }
+
+    @Override
+    public void deliveryComplete(IMqttDeliveryToken token) {
+    }
+}

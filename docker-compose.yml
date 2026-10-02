@@ -1,0 +1,72 @@
+services:
+  # No ports published — only the backend needs to reach this, over the
+  # internal Docker network (postgres:5432), never from the host.
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: relaytiming
+      POSTGRES_USER: relaytiming
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-relaytiming}
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    restart: unless-stopped
+
+  # LAN-reachable on purpose: the physical RFID reader publishes tag reads
+  # here over MQTT and needs to reach it at the standard port from the event
+  # network, not just from other containers.
+  mosquitto:
+    image: eclipse-mosquitto:2
+    volumes:
+      - ./mosquitto/mosquitto.conf:/mosquitto/config/mosquitto.conf:ro
+      - mosquitto-data:/mosquitto/data
+    ports:
+      - "1883:1883"
+    restart: unless-stopped
+
+  backend:
+    build: ./backend
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/relaytiming
+      SPRING_DATASOURCE_USERNAME: relaytiming
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:-relaytiming}
+      MQTT_BROKER_URL: tcp://mosquitto:1883
+    depends_on:
+      - postgres
+      - mosquitto
+    ports:
+      - "127.0.0.1:8080:8080"
+    restart: unless-stopped
+
+  # Public, read-only board. Safe to tunnel/expose to the internet (e.g. via
+  # ngrok) — the nginx config here rejects every non-GET/HEAD request to
+  # /api/, and the build strips out every admin control (Add Team, Edit,
+  # Start/Stop Race, Clear buttons) from the UI itself.
+  frontend-public:
+    build:
+      context: ./frontend
+      args:
+        VITE_READ_ONLY: "true"
+        NGINX_CONF: nginx.public.conf
+    depends_on:
+      - backend
+    ports:
+      - "80:80"
+    restart: unless-stopped
+
+  # Full admin board with race controls. Bound to loopback only — never
+  # exposed to the LAN or tunneled to the internet.
+  frontend-admin:
+    build:
+      context: ./frontend
+      args:
+        VITE_READ_ONLY: "false"
+        NGINX_CONF: nginx.conf
+    depends_on:
+      - backend
+    ports:
+      - "127.0.0.1:3000:80"
+    restart: unless-stopped
+
+volumes:
+  postgres-data:
+  mosquitto-data:
